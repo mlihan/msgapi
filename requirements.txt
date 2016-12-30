@@ -1,2 +1,4 @@
 requests >= 2.0
 future
+gunicorn==19.4.5
+flask
