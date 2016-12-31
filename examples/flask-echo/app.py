@@ -51,8 +51,8 @@ def callback():
 
     # get request body as text
     body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
-    app.logger.info("Signature: " + signature)
+    #app.logger.info("Request body: " + body)
+    #pp.logger.info("Signature: " + signature)
 
     # parse webhook body
     try:
@@ -66,6 +66,9 @@ def callback():
             continue
         if not isinstance(event.message, TextMessage):
             continue
+        app.logger.info(event.message)
+        if not event.message.lower().startswith('@so'):
+            continue
 
         line_bot_api.reply_message(
             event.reply_token,
@@ -75,7 +78,6 @@ def callback():
     return 'OK'
 
 def sendText(text):
-    app.logger.info("hello")
     text_message = TextSendMessage(text=text)
 
 def sendTemplate():
