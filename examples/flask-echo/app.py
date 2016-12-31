@@ -26,7 +26,9 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, TemplateSendMessage
+    MessageEvent, TextMessage, TextSendMessage, TemplateSendMessage, 
+    ButtonsTemplate, ConfirmTemplate, CarouselTemplate, CarouselColumn, 
+    TemplateAction, PostbackTemplateAction, MessageTemplateAction, URITemplateAction
 )
 
 app = Flask(__name__)
