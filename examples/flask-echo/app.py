@@ -77,7 +77,7 @@ def callback():
         # if prefix is @go, check 
         elif text_message.lower().startswith('@go'):
             # do nothing first
-            response = None 
+            data = None 
         else:
             continue
 
@@ -100,7 +100,7 @@ def queryStackOverflow(query):
         answer=1
         ) 
     response = requests.get(url, headers)
-    data = json.load(response.text)
+    data = json.loads(response.text)
     return data
 
 def sendText(text):
