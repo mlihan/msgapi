@@ -67,7 +67,7 @@ def callback():
         if not isinstance(event.message, TextMessage):
             continue
         app.logger.info(event.message)
-        if not event.message.lower().startswith('@so'):
+        if not event.message.text.lower().startswith('@so'):
             continue
 
         line_bot_api.reply_message(
