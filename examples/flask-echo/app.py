@@ -95,6 +95,7 @@ def sendText(text):
 
 def analyzeResponse(response, type):
     app.logger.info("type:" + type) 
+    template = None
     if type is 'so':
         template = TemplateSendMessage(
             alt_text='Buttons template',
