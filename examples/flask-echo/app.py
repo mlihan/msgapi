@@ -74,8 +74,9 @@ def callback():
         if text_message.lower().startswith('@so'):
             response = queryStackOverflow(text_message)            
         # if prefix is @go, check 
-        #elif text_message.lower().startswith('@go'):
-        #    template = analyzeResponse(response, 'go')
+        elif text_message.lower().startswith('@go'):
+            # do nothing first
+            response = None 
         else:
             continue
 
