@@ -54,7 +54,7 @@ def callback():
     # get request body as text
     body = request.get_data(as_text=True)
     #app.logger.info("Request body: " + body)
-    #pp.logger.info("Signature: " + signature)
+    #app.logger.info("Signature: " + signature)
 
     # parse webhook body
     try:
@@ -71,20 +71,18 @@ def callback():
             continue
 
         # if prefix is @so, check StackOverflow
-        hasKeyword = True
         if text_message.lower().startswith('@so'):
             response = queryStackOverflow(text_message)            
         # if prefix is @go, check 
         #elif text_message.lower().startswith('@go'):
         #    template = analyzeResponse(response, 'go')
         else:
-            hasKeyword = False
+            continue
 
-        if hasKeyword:
-            template = analyzeResponse(response, text_message[1:3])
-            line_bot_api.reply_message(
-                event.reply_token, template
-            )
+        template = analyzeResponse(response, text_message[1:3])
+        line_bot_api.reply_message(
+            event.reply_token, template
+        )
 
     return 'OK'
 
@@ -96,6 +94,7 @@ def sendText(text):
     text_message = TextSendMessage(text=text)
 
 def analyzeResponse(response, type):
+    app.logger.info("type:" + type) 
     if type is 'so':
         template = TemplateSendMessage(
             alt_text='Buttons template',
