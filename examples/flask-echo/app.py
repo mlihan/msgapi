@@ -85,4 +85,4 @@ if __name__ == "__main__":
     arg_parser.add_argument('-d', '--debug', default=False, help='debug')
     options = arg_parser.parse_args()
 
-    app.run(debug=options.debug, port=int(options.port))
+    app.run(debug=options.debug, host='0.0.0.0', port=int(options.port))
