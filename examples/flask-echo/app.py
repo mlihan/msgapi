@@ -95,9 +95,8 @@ def sendText(text):
     text_message = TextSendMessage(text=text)
 
 def analyzeResponse(response, type):
-    app.logger.info("type:" + type) 
-    template = None
     if type is 'so':
+        app.logger.info("type:" + type) 
         template = TemplateSendMessage(
             alt_text='Buttons template',
             template=ButtonsTemplate(
@@ -121,12 +120,14 @@ def analyzeResponse(response, type):
                 ]
             )
         )
+        return template
     elif type is 'go':
+        app.logger.info("type:" + type) 
         template = ImageSendMessage(
                     original_content_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg',
                     preview_image_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg'
                     )
-    return template
+        return template
 
 
 if __name__ == "__main__":
