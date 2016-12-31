@@ -60,27 +60,35 @@ def callback():
     except InvalidSignatureError:
         abort(500)
 
-    # if event is MessageEvent and message is TextMessage, then echo text
+    # if event is MessageEvent and message is TextMessage, then check prefix
     for event in events:
+        text_message = event.message.text
         if not isinstance(event, MessageEvent):
             continue
         if not isinstance(event.message, TextMessage):
             continue
-        app.logger.info(event.message)
-        if not event.message.text.lower().startswith('@so'):
-            continue
+        # if prefix is @so, check StackOverflow
+        if text_message.lower().startswith('@so'):
+            response = queryStackOverflow(text_message)
+            template = analyzeResponse(response, 'so')
+            sendTemplate(template)
 
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=event.message.text)
-        )
+        # if prefix is @go, check 
+        if text_message.lower().startswith('@so'):
+            line_bot_api.reply_message(
+                event.reply_token, TextSendMessage(text=text_message)
+            )
 
     return 'OK'
+
+def queryStackOverflow(query):
+    response = 'OK'
+    return response
 
 def sendText(text):
     text_message = TextSendMessage(text=text)
 
-def sendTemplate():
+def analyzeResponse(response, type):
     buttons_template_message = TemplateSendMessage(
         alt_text='Buttons template',
         template=ButtonsTemplate(
