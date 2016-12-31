@@ -119,7 +119,6 @@ class WebhookParser(object):
         :rtype: list[T <= :py:class:`linebot.models.events.Event`]
         :return:
         """
-        LOGGER.warn('Parsing signature' + signature)
         if not self.signature_validator.validate(body, signature):
             raise InvalidSignatureError(
                 'Invalid signature. signature=' + signature)
