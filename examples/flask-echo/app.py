@@ -100,7 +100,7 @@ def queryStackOverflow(query):
         answer=1
         ) 
     response = requests.get(url, headers)
-    data = json.loads(response.text)
+    data = response.json()
     return data
 
 def sendText(text):
@@ -109,7 +109,7 @@ def sendText(text):
 def analyzeResponse(data, type):
     index = 0
     if type == 'so':
-        app.logger.info("type:" + type) 
+        app.logger.info("data:" + data['items']) 
         template = TemplateSendMessage(
             alt_text='Message only available in your smartphone',
             template=ButtonsTemplate(
