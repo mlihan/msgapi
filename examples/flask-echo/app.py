@@ -74,8 +74,8 @@ def callback():
             response = queryStackOverflow(text_message)
             template = analyzeResponse(response, 'so')
             line_bot_api.reply_message(event.reply_token, ImageSendMessage(
-                original_content_url='https://example.com/original.jpg',
-                preview_image_url='https://example.com/preview.jpg')
+                original_content_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg',
+                preview_image_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg')
             )
 
         # if prefix is @go, check 
