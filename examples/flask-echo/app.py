@@ -109,7 +109,7 @@ def sendText(text):
 def analyzeResponse(data, type):
     index = 0
     if type == 'so':
-        app.logger.info("data:" + data['items']) 
+        app.logger.info("data:" + str(data['items'][index]['link']) 
         template = TemplateSendMessage(
             alt_text='Message only available in your smartphone',
             template=ButtonsTemplate(
