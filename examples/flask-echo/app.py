@@ -73,7 +73,7 @@ def callback():
         if text_message.lower().startswith('@so'):
             response = queryStackOverflow(text_message)
             template = analyzeResponse(response, 'so')
-            sendTemplate(template)
+            line_bot_api.reply_message(event.reply_token, template)
 
         # if prefix is @go, check 
         if text_message.lower().startswith('@so'):
@@ -114,6 +114,7 @@ def analyzeResponse(response, type):
             ]
         )
     )
+    return buttons_template_message
 
 
 if __name__ == "__main__":
