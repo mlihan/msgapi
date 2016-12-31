@@ -16,6 +16,7 @@ from __future__ import unicode_literals
 
 import os
 import sys
+import requests, json
 from argparse import ArgumentParser
 
 from flask import Flask, request, abort
@@ -72,7 +73,7 @@ def callback():
 
         # if prefix is @so, check StackOverflow
         if text_message.lower().startswith('@so'):
-            response = queryStackOverflow(text_message)            
+            data = queryStackOverflow(text_message)            
         # if prefix is @go, check 
         elif text_message.lower().startswith('@go'):
             # do nothing first
@@ -80,70 +81,55 @@ def callback():
         else:
             continue
 
-        sendMessage = analyzeResponse(response, text_message[1:3])
+        sendMessage = analyzeResponse(data, text_message[1:3])
         line_bot_api.reply_message(
-            event.reply_token, TemplateSendMessage(
-                alt_text='Buttons template',
-                template=ButtonsTemplate(
-                    thumbnail_image_url='https://example.com/image.jpg',
-                    title='Menu',
-                    text='Please select',
-                    actions=[
-                        PostbackTemplateAction(
-                            label='postback',
-                            text='postback text',
-                            data='action=buy&itemid=1'
-                        ),
-                        MessageTemplateAction(
-                            label='message',
-                            text='message text'
-                        ),
-                        URITemplateAction(
-                            label='uri',
-                            uri='http://example.com/'
-                        )
-                    ]
-                )
-            )
+            event.reply_token, sendMessage
         )
 
     return 'OK'
 
 def queryStackOverflow(query):
-    response = 'OK'
-    return response
+    url = 'https://api.stackexchange.com/2.2/search/advanced'
+    headers = dict(
+        order='desc',
+        sort='relevance',
+        views='500',
+        site='stackoverflow',
+        q=query,
+        body=query,
+        answer=1
+        ) 
+    response = requests.get(url, headers)
+    data = json.load(response.text)
+    return data
 
 def sendText(text):
     text_message = TextSendMessage(text=text)
 
-def analyzeResponse(response, type):
-    if type is 'so':
+def analyzeResponse(data, type):
+    index = 0
+    if type == 'so':
         app.logger.info("type:" + type) 
         template = TemplateSendMessage(
-            alt_text='Buttons template',
+            alt_text='Message only available in your smartphone',
             template=ButtonsTemplate(
-                thumbnail_image_url='https://example.com/image.jpg',
-                title='Menu',
-                text='Please select',
+                thumbnail_image_url=data['items'][index]['link'],
+                title=data['items'][index]['title'],
+                text='Tags:' + json.dumps(data['items'][index]['tags']),
                 actions=[
-                    PostbackTemplateAction(
-                        label='postback',
-                        text='postback text',
-                        data='action=buy&itemid=1'
-                    ),
-                    MessageTemplateAction(
-                        label='message',
-                        text='message text'
+                    URITemplateAction(
+                        label='Read Article',
+                        uri=data['items'][index]['link']
                     ),
                     URITemplateAction(
-                        label='uri',
-                        uri='http://example.com/'
+                        label='Share',
+                        uri='https://lineit.line.me/share/ui?url=' + data['items'][index]['link']
                     )
                 ]
             )
         )
         return template
-    elif type is 'go':
+    elif type == 'go':
         app.logger.info("type:" + type) 
         template = ImageSendMessage(
                     original_content_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg',
