@@ -69,19 +69,21 @@ def callback():
             continue
         if not isinstance(event.message, TextMessage):
             continue
-        # if prefix is @so, check StackOverflow
-        if text_message.lower().startswith('@so'):
-            response = queryStackOverflow(text_message)
-            template = analyzeResponse(response, 'so')
-            line_bot_api.reply_message(event.reply_token, ImageSendMessage(
-                original_content_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg',
-                preview_image_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg')
-            )
 
-        # if prefix is @go, check 
+        # if prefix is @so, check StackOverflow
+        hasKeyword = True
         if text_message.lower().startswith('@so'):
+            response = queryStackOverflow(text_message)            
+        # if prefix is @go, check 
+        #elif text_message.lower().startswith('@go'):
+        #    template = analyzeResponse(response, 'go')
+        else:
+            hasKeyword = False
+
+        if hasKeyword:
+            template = analyzeResponse(response, text_message[1:3])
             line_bot_api.reply_message(
-                event.reply_token, TextSendMessage(text=text_message)
+                event.reply_token, template
             )
 
     return 'OK'
@@ -94,30 +96,36 @@ def sendText(text):
     text_message = TextSendMessage(text=text)
 
 def analyzeResponse(response, type):
-    buttons_template_message = TemplateSendMessage(
-        alt_text='Buttons template',
-        template=ButtonsTemplate(
-            thumbnail_image_url='https://example.com/image.jpg',
-            title='Menu',
-            text='Please select',
-            actions=[
-                PostbackTemplateAction(
-                    label='postback',
-                    text='postback text',
-                    data='action=buy&itemid=1'
-                ),
-                MessageTemplateAction(
-                    label='message',
-                    text='message text'
-                ),
-                URITemplateAction(
-                    label='uri',
-                    uri='http://example.com/'
-                )
-            ]
+    if type is 'so':
+        template = TemplateSendMessage(
+            alt_text='Buttons template',
+            template=ButtonsTemplate(
+                thumbnail_image_url='https://example.com/image.jpg',
+                title='Menu',
+                text='Please select',
+                actions=[
+                    PostbackTemplateAction(
+                        label='postback',
+                        text='postback text',
+                        data='action=buy&itemid=1'
+                    ),
+                    MessageTemplateAction(
+                        label='message',
+                        text='message text'
+                    ),
+                    URITemplateAction(
+                        label='uri',
+                        uri='http://example.com/'
+                    )
+                ]
+            )
         )
-    )
-    return buttons_template_message
+    elif type is 'go':
+        template = ImageSendMessage(
+                    original_content_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg',
+                    preview_image_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg'
+                    )
+    return template
 
 
 if __name__ == "__main__":
