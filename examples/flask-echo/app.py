@@ -57,9 +57,7 @@ def callback():
     # parse webhook body
     try:
         events = parser.parse(body, signature)
-    except Exception as e:
-        print str(e)
-    #except InvalidSignatureError:
+    except InvalidSignatureError:
         abort(500)
 
     # if event is MessageEvent and message is TextMessage, then echo text
@@ -75,6 +73,35 @@ def callback():
         )
 
     return 'OK'
+
+def sendText(text):
+    app.logger.info("hello")
+    text_message = TextSendMessage(text=text)
+
+def sendTemplate():
+    buttons_template_message = TemplateSendMessage(
+        alt_text='Buttons template',
+        template=ButtonsTemplate(
+            thumbnail_image_url='https://example.com/image.jpg',
+            title='Menu',
+            text='Please select',
+            actions=[
+                PostbackTemplateAction(
+                    label='postback',
+                    text='postback text',
+                    data='action=buy&itemid=1'
+                ),
+                MessageTemplateAction(
+                    label='message',
+                    text='message text'
+                ),
+                URITemplateAction(
+                    label='uri',
+                    uri='http://example.com/'
+                )
+            ]
+        )
+    )
 
 
 if __name__ == "__main__":
