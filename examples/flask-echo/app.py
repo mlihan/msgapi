@@ -89,16 +89,16 @@ def callback():
 
 def queryStackOverflow(query):
     url = 'https://api.stackexchange.com/2.2/search/advanced'
-    headers = dict(
-        order='desc',
-        sort='relevance',
-        views='500',
-        site='stackoverflow',
-        q=query,
-        body=query,
-        answer='1'
+    headers = (
+        ('order'='desc'),
+        ('sort'='relevance'),
+        ('views'='500'),
+        ('site'='stackoverflow'),
+        ('q'=query),
+        ('body'=query),
+        ('answer'='1')
         ) 
-    response = requests.get(url=url, headers=headers)
+    response = requests.get(url=url, params=headers)
     data = json.loads(response.text)
     app.logger.info(response.text)
     index = 0
