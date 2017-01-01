@@ -99,8 +99,8 @@ def queryStackOverflow(query):
         answer=1
         ) 
     response = requests.get(url=url, params=headers)
-    data = json.loads(resp.text)
-    app.logger.info(resp.text)
+    data = json.loads(response.text)
+    app.logger.info(response.text)
     
     template = TemplateSendMessage(
         alt_text='This message is only available on your smartphone',
