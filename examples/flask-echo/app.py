@@ -80,9 +80,10 @@ def callback():
             sendMessage = None 
         else:
             continue
-
+        a = TemplateSendMessage()
+        a = sendMessage
         line_bot_api.reply_message(
-            event.reply_token, sendMessage
+            event.reply_token, a
         )
 
     return 'OK'
@@ -90,15 +91,7 @@ def callback():
 def queryStackOverflow(query):
     query = query[3:]
     url = 'https://api.stackexchange.com/2.2/search/advanced?order=desc&sort=relevance&q=' + query + '&answers=1&body=' + query + '&views=200&site=stackoverflow'
-    headers = (
-        ('order'),('desc'),
-        ('sort'),('relevance'),
-        ('views'),('500'),
-        ('site'),('stackoverflow'),
-        ('q'),(query),
-        ('body'),(query),
-        ('answer'),('1')
-    )
+    
     app.logger.info(url) 
     response = requests.get(url=url)
     data = json.loads(response.text)
