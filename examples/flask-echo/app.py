@@ -90,13 +90,13 @@ def callback():
 def queryStackOverflow(query):
     url = 'https://api.stackexchange.com/2.2/search/advanced'
     headers = (
-        ('order'='desc'),
-        ('sort'='relevance'),
-        ('views'='500'),
-        ('site'='stackoverflow'),
-        ('q'=query),
-        ('body'=query),
-        ('answer'='1')
+        ('order'),('desc'),
+        ('sort'),('relevance'),
+        ('views'),('500'),
+        ('site'),('stackoverflow'),
+        ('q'),(query),
+        ('body'),(query),
+        ('answer'),('1')
         ) 
     response = requests.get(url=url, params=headers)
     data = json.loads(response.text)
