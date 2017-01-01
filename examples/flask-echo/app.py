@@ -88,6 +88,7 @@ def callback():
     return 'OK'
 
 def queryStackOverflow(query):
+    query = query[3:]
     url = 'https://api.stackexchange.com/2.2/search/advanced?order=desc&sort=relevance&q=' + query + '&answers=1&body=' + query + '&views=200&site=stackoverflow'
     headers = (
         ('order'),('desc'),
@@ -97,7 +98,8 @@ def queryStackOverflow(query):
         ('q'),(query),
         ('body'),(query),
         ('answer'),('1')
-        ) 
+    )
+    app.logger.info(url) 
     response = requests.get(url=url)
     data = json.loads(response.text)
     app.logger.info(response.text)
