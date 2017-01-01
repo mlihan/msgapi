@@ -88,7 +88,7 @@ def callback():
     return 'OK'
 
 def queryStackOverflow(query):
-    url = 'https://api.stackexchange.com/2.2/search/advanced'
+    url = 'https://api.stackexchange.com/2.2/search/advanced?/2.2/search/advanced?order=desc&sort=relevance&q=AttributeError&answers=1&body=AttributeError&views=200&site=stackoverflow'
     headers = dict(
         order='desc',
         sort='relevance',
@@ -98,7 +98,7 @@ def queryStackOverflow(query):
         body=query,
         answer=1
         ) 
-    response = requests.get(url=url, params=headers)
+    response = requests.get(url=url)
     data = json.loads(response.text)
     app.logger.info(response.text)
     index = 0
