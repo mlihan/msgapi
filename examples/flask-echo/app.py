@@ -101,34 +101,8 @@ def queryStackOverflow(query):
     response = requests.get(url=url, params=headers)
     data = json.loads(response.text)
     app.logger.info(response.text)
-    
-    template = TemplateSendMessage(
-        alt_text='This message is only available on your smartphone',
-        template=ButtonsTemplate(
-            thumbnail_image_url=data['items'][index]['link'],
-            title=data['items'][index]['title'],
-            text='Tags:' + json.dumps(data['items'][index]['tags']),
-            actions=[
-                URITemplateAction(
-                    label='Read Article',
-                    uri=data['items'][index]['link']
-                ),
-                URITemplateAction(
-                    label='Share',
-                    uri='https://lineit.line.me/share/ui?url=' + data['items'][index]['link']
-                )
-            ]
-        )
-    )
-    return template
-
-def sendText(text):
-    text_message = TextSendMessage(text=text)
-
-def analyzeResponse(data, type):
     index = 0
-    if type == 'so':
-        app.logger.info("data:" + str(data['items'][index]['link']))
+    if data['items'] is not None and data['items'][index] is not None:    
         template = TemplateSendMessage(
             alt_text='This message is only available on your smartphone',
             template=ButtonsTemplate(
@@ -147,14 +121,22 @@ def analyzeResponse(data, type):
                 ]
             )
         )
-        return template
-    elif type == 'go':
-        app.logger.info("type:" + type) 
-        template = ImageSendMessage(
-                    original_content_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg',
-                    preview_image_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg'
-                    )
-        return template
+    else:
+        template = TextSendMessage(text='No article found.')
+
+    return template
+
+def sendText(text):
+    text_message = TextSendMessage(text=text)
+
+def querySearchEngine(data, type):
+    index = 0
+    app.logger.info("type:" + type) 
+    template = ImageSendMessage(
+                original_content_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg',
+                preview_image_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg'
+                )
+    return template
 
 
 if __name__ == "__main__":
