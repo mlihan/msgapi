@@ -73,15 +73,14 @@ def callback():
 
         # if prefix is @so, check StackOverflow
         if text_message.lower().startswith('@so'):
-            data = queryStackOverflow(text_message)            
+            sendMessage = queryStackOverflow(text_message)            
         # if prefix is @go, check 
         elif text_message.lower().startswith('@go'):
             # do nothing first
-            data = None 
+            sendMessage = None 
         else:
             continue
 
-        sendMessage = analyzeResponse(data, text_message[1:3])
         line_bot_api.reply_message(
             event.reply_token, sendMessage
         )
@@ -99,9 +98,29 @@ def queryStackOverflow(query):
         body=query,
         answer=1
         ) 
-    response = requests.get(url, headers)
-    data = response.json()
-    return data
+    response = requests.get(url=url, params=headers)
+    data = json.loads(resp.text)
+    app.logger.info(resp.text)
+    
+    template = TemplateSendMessage(
+        alt_text='This message is only available on your smartphone',
+        template=ButtonsTemplate(
+            thumbnail_image_url=data['items'][index]['link'],
+            title=data['items'][index]['title'],
+            text='Tags:' + json.dumps(data['items'][index]['tags']),
+            actions=[
+                URITemplateAction(
+                    label='Read Article',
+                    uri=data['items'][index]['link']
+                ),
+                URITemplateAction(
+                    label='Share',
+                    uri='https://lineit.line.me/share/ui?url=' + data['items'][index]['link']
+                )
+            ]
+        )
+    )
+    return template
 
 def sendText(text):
     text_message = TextSendMessage(text=text)
@@ -111,7 +130,7 @@ def analyzeResponse(data, type):
     if type == 'so':
         app.logger.info("data:" + str(data['items'][index]['link']))
         template = TemplateSendMessage(
-            alt_text='Message only available in your smartphone',
+            alt_text='This message is only available on your smartphone',
             template=ButtonsTemplate(
                 thumbnail_image_url=data['items'][index]['link'],
                 title=data['items'][index]['title'],
