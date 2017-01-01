@@ -96,7 +96,7 @@ def queryStackOverflow(query):
         site='stackoverflow',
         q=query,
         body=query,
-        answer=1
+        answer='1'
         ) 
     response = requests.get(url=url, headers=headers)
     data = json.loads(response.text)
