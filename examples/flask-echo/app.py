@@ -122,19 +122,64 @@ def queryStackOverflow(query):
                 ]
             )
             columns.append(temp)
-            print 'length is' + str(len(columns))
-            print str(index) + ':' + item['title'] + ":" + item['link'] + ":" + json.dumps(item['tags'])
-
+        print columns
         carousel_template_message = TemplateSendMessage(
             alt_text='This message is only available on your smartphone',
-            template=CarouselTemplate(
-                columns=columns
-            )
+            template=CarouselTemplate(columns=columns)
         )
+        print carousel_template_message
         return carousel_template_message
     else:
+        carousel_template_message = TemplateSendMessage(
+            alt_text='Carousel template',
+            template=CarouselTemplate(
+                columns=[
+                    CarouselColumn(
+                        thumbnail_image_url='https://example.com/item1.jpg',
+                        title='this is menu1',
+                        text='description1',
+                        actions=[
+                            PostbackTemplateAction(
+                                label='postback1',
+                                text='postback text1',
+                                data='action=buy&itemid=1'
+                            ),
+                            MessageTemplateAction(
+                                label='message1',
+                                text='message text1'
+                            ),
+                            URITemplateAction(
+                                label='uri1',
+                                uri='http://example.com/1'
+                            )
+                        ]
+                    ),
+                    CarouselColumn(
+                        thumbnail_image_url='https://example.com/item2.jpg',
+                        title='this is menu2',
+                        text='description2',
+                        actions=[
+                            PostbackTemplateAction(
+                                label='postback2',
+                                text='postback text2',
+                                data='action=buy&itemid=2'
+                            ),
+                            MessageTemplateAction(
+                                label='message2',
+                                text='message text2'
+                            ),
+                            URITemplateAction(
+                                label='uri2',
+                                uri='http://example.com/2'
+                            )
+                        ]
+                    )
+                ]
+            )
+        )
         text_message = TextSendMessage(text='No result found. Please try different keywords?')
-        return text_message
+        print carousel_template_message
+        return carousel_template_message
     
 def sendText(text):
     text_message = TextSendMessage(text=text)
