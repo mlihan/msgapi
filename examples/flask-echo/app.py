@@ -137,7 +137,7 @@ def queryStackOverflow(query):
                     CarouselColumn(
                         thumbnail_image_url='http://stackoverflow.com/questions/20235386/attribute-error-object-has-no-attribute-cleaned-data',
                         title='this is menu1',
-                        text='Tags:[\"python\", \"raspberry-pi\", \"gpio\"]',
+                        text='Tags',
                         actions=[
                             URITemplateAction(
                                 label='uri1',
