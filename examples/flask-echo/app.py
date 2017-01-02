@@ -143,9 +143,9 @@ def queryStackOverflow(query):
                                 label='uri1',
                                 uri='http://example.com/1'
                             ),
-                            URITemplateAction(
-                                label='uri2',
-                                uri='http://example.com/2'
+                            MessageTemplateAction(
+                                label='message1',
+                                text='message text1'
                             )
                         ]
                     ),
