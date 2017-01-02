@@ -131,26 +131,21 @@ def queryStackOverflow(query):
         return carousel_template_message
     else:
         carousel_template_message = TemplateSendMessage(
-            alt_text='Carousel template',
+            alt_text='This message is only available on your smartphone',
             template=CarouselTemplate(
                 columns=[
                     CarouselColumn(
-                        thumbnail_image_url='https://example.com/item1.jpg',
+                        thumbnail_image_url='http://stackoverflow.com/questions/20235386/attribute-error-object-has-no-attribute-cleaned-data',
                         title='this is menu1',
-                        text='description1',
+                        text='Tags:[\"python\", \"raspberry-pi\", \"gpio\"]',
                         actions=[
-                            PostbackTemplateAction(
-                                label='postback1',
-                                text='postback text1',
-                                data='action=buy&itemid=1'
-                            ),
-                            MessageTemplateAction(
-                                label='message1',
-                                text='message text1'
-                            ),
                             URITemplateAction(
                                 label='uri1',
                                 uri='http://example.com/1'
+                            ),
+                            URITemplateAction(
+                                label='uri2',
+                                uri='http://example.com/2'
                             )
                         ]
                     ),
