@@ -120,10 +120,6 @@ def queryStackOverflow(query):
                     URITemplateAction(
                         label='Read Article',
                         uri=item['link']
-                    ),
-                    URITemplateAction(
-                        label='Share',
-                        uri='https://lineit.line.me/share/ui?url=' + item['link']
                     )
                 ]
             )
