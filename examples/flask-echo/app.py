@@ -107,7 +107,7 @@ def queryStackOverflow(query):
         columns = []
         for index, item in enumerate(data['items']):
             temp = CarouselColumn(
-                thumbnail_image_url=item['link'],
+                thumbnail_image_url='https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-icon.png?v=c78bd457575a',
                 title=item['title'],
                 text='Tags:' + json.dumps(item['tags']),
                 actions=[
@@ -145,7 +145,7 @@ def queryStackOverflow(query):
                             ),
                             MessageTemplateAction(
                                 label='message1',
-                                text='message text1'
+                                text='message text'
                             )
                         ]
                     ),
