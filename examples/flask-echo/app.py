@@ -122,7 +122,7 @@ def queryStackOverflow(query):
                 ]
             )
             columns.append(temp)
-            print 'length is' + len(columns)
+            print 'length is' + str(len(columns))
             print str(index) + ':' + item['title'] + ":" + item['link'] + ":" + json.dumps(item['tags'])
 
         carousel_template_message = TemplateSendMessage(
