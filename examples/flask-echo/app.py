@@ -146,6 +146,11 @@ def queryStackOverflow(query):
                             MessageTemplateAction(
                                 label='message1',
                                 text='message text'
+                            ),
+                            PostbackTemplateAction(
+                                label='postback1',
+                                text='postback text1',
+                                data='action=buy&itemid=1'
                             )
                         ]
                     ),
