@@ -90,37 +90,52 @@ def callback():
 
 def queryStackOverflow(query):
     query = query[3:]
-    url = 'https://api.stackexchange.com/2.2/search/advanced?order=desc&sort=relevance&q=' + query + '&answers=1&body=' + query + '&views=200&site=stackoverflow'
-    
-    app.logger.info(url) 
-    response = requests.get(url=url)
-    data = json.loads(response.text)
-    app.logger.info(response.text)
-    index = 0
-    if data['items'] is not None and data['items'][index] is not None:    
-        template = TemplateSendMessage(
-            alt_text='This message is only available on your smartphone',
-            template=ButtonsTemplate(
-                thumbnail_image_url=data['items'][index]['link'],
-                title=data['items'][index]['title'],
-                text='Tags:' + json.dumps(data['items'][index]['tags']),
+    url = 'https://api.stackexchange.com/2.2/search/advanced?'
+    payload = { 
+        'site': 'stackoverflow',
+        'views':'200',
+        'answers':'1',
+        'order':'desc',
+        'sort':'relevance',
+        'pagesize':'5',
+        'q':query,
+        'body':query
+    }
+    response = requests.get(url=url, params=payload)
+    data = response.json()
+    if data['has_more']:
+        columns = []
+        for index, item in enumerate(data['items']):
+            temp = CarouselColumn(
+                thumbnail_image_url=item['link'],
+                title=item['title'],
+                text='Tags:' + json.dumps(item['tags']),
                 actions=[
                     URITemplateAction(
                         label='Read Article',
-                        uri=data['items'][index]['link']
+                        uri=item['link']
                     ),
                     URITemplateAction(
                         label='Share',
-                        uri='https://lineit.line.me/share/ui?url=' + data['items'][index]['link']
+                        uri='https://lineit.line.me/share/ui?url=' + item['link']
                     )
                 ]
             )
+            columns.append(temp)
+            print 'length is' + len(columns)
+            print str(index) + ':' + item['title'] + ":" + item['link'] + ":" + json.dumps(item['tags'])
+
+        carousel_template_message = TemplateSendMessage(
+            alt_text='This message is only available on your smartphone',
+            template=CarouselTemplate(
+                columns=columns
+            )
         )
+        return carousel_template_message
     else:
-        template = TextSendMessage(text='No article found.')
-
-    return template
-
+        text_message = TextSendMessage(text='No result found. Please try different keywords?')
+        return text_message
+    
 def sendText(text):
     text_message = TextSendMessage(text=text)
 
