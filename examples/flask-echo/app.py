@@ -27,7 +27,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, TemplateSendMessage, ImageSendMessage,
+    MessageEvent, TextMessage, TextSendMessage, TemplateSendMessage, ImageSendMessage, ImagemapSendMessage,
     ButtonsTemplate, ConfirmTemplate, CarouselTemplate, CarouselColumn, 
     TemplateAction, PostbackTemplateAction, MessageTemplateAction, URITemplateAction
 )
@@ -136,8 +136,8 @@ def queryStackOverflow(query):
                         text='Tags',
                         actions=[
                             URITemplateAction(
-                                label='uri1',
-                                uri='http://example.com/1'
+                                label='',
+                                uri=''
                             ),
                             PostbackTemplateAction(
                                 label='postback1',
