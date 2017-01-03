@@ -68,7 +68,6 @@ def callback():
 
     # if event is MessageEvent and message is TextMessage, then check prefix
     for event in events:
-        text_message = event.message.text
         # For bluemix
         if isinstance(event, FollowEvent):
             # If user just added me, send welcome and confirm message
@@ -92,6 +91,7 @@ def callback():
         #    continue
         #if not isinstance(event.message, TextMessage):
         #    continue
+        #text_message = event.message.text
         # if prefix is @so, check StackOverflow
         #if text_message.lower().startswith('@so'):
         #    sendMessage = queryStackOverflow(text_message)            
