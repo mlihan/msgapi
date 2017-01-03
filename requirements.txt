@@ -3,3 +3,4 @@ future
 gunicorn==19.4.5
 flask
 line-bot-sdk
+configparser
