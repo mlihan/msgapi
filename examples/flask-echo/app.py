@@ -123,8 +123,8 @@ def queryStackOverflow(query):
                         data='action=buy&itemid=1'
                     ),
                     MessageTemplateAction(
-                        label='This is useful',
-                        text='Article ' + str(index) + ' is useful.'
+                        label='message1',
+                        text='message text1'
                     )
                 ]
             )
