@@ -116,18 +116,17 @@ def queryStackOverflow(query):
                         text='postback text1',
                         data='action=buy&itemid=1'
                     ),
-                    URITemplateAction(
-                        label='Read Article',
-                        uri=item['link']
-                    ),
                     MessageTemplateAction(
-                        label='message',
-                        text='hello'
+                        label='message1',
+                        text='message text1'
+                    ),
+                    URITemplateAction(
+                        label='uri1',
+                        uri='http://example.com/1'
                     )
                 ]
             )
             columns.append(temp)
-        print columns
         carousel_template_message = TemplateSendMessage(
             alt_text='This message is only available on your smartphone',
             template=CarouselTemplate(columns=columns)
@@ -157,7 +156,6 @@ def queryStackOverflow(query):
                                 label='uri1',
                                 uri='http://example.com/1'
                             )
-
                         ]
                     ),
                     CarouselColumn(
