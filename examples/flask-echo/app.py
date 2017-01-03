@@ -109,7 +109,7 @@ def queryStackOverflow(query):
         for index, item in enumerate(data['items']):
             print str(index) + ':' + str(item)
             temp = CarouselColumn(
-                thumbnail_image_url='https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-icon.png',
+                thumbnail_image_url='https://example.com/item2.jpg',
                 title=item['title'],
                 text='Tags',
                 actions=[
