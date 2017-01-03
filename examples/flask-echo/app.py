@@ -177,13 +177,13 @@ def queryStackOverflow(query):
         carousel_template_message = TemplateSendMessage(
             alt_text='Test',
             template=CarouselTemplate(
-                columns=columns
+                columns=columns2
             )
         )
         return carousel_template_message
     else:
         imagemap_message = ImagemapSendMessage(
-            base_url="http://stackoverflow.com/questions",
+            base_url='http://stackoverflow.com/questions',
             alt_text='this is an imagemap',
             base_size=BaseSize(height=1040, width=1040),
             actions=[
