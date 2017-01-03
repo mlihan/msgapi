@@ -121,8 +121,8 @@ def queryStackOverflow(query):
                         uri=item['link']
                     ),
                     MessageTemplateAction(
-                        label='',
-                        text=''
+                        label='message',
+                        text='hello'
                     )
                 ]
             )
