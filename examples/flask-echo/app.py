@@ -29,7 +29,8 @@ from linebot.exceptions import (
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage, TemplateSendMessage, ImageSendMessage, ImagemapSendMessage,
     ButtonsTemplate, ConfirmTemplate, CarouselTemplate, CarouselColumn, 
-    TemplateAction, PostbackTemplateAction, MessageTemplateAction, URITemplateAction
+    TemplateAction, PostbackTemplateAction, MessageTemplateAction, URITemplateAction, 
+    BaseSize, URIImagemapAction, MessageImagemapAction
 )
 
 app = Flask(__name__)
@@ -126,51 +127,53 @@ def queryStackOverflow(query):
         )
         return imagemap_message
     else:
+        columns = [
+            CarouselColumn(
+                thumbnail_image_url='https://example.com/item2.jpg',
+                title='this is menu1',
+                text='Tags',
+                actions=[
+                    URITemplateAction(
+                        label='uri1',
+                        uri='http://example.com/1'
+                    ),
+                    PostbackTemplateAction(
+                        label='postback1',
+                        text='postback text1',
+                        data='action=buy&itemid=1'
+                    ),
+                    MessageTemplateAction(
+                        label='message1',
+                        text='message text1'
+                    )
+                ]
+            ),
+            CarouselColumn(
+                thumbnail_image_url='https://example.com/item2.jpg',
+                title='this is menu2',
+                text='description2',
+                actions=[
+                    PostbackTemplateAction(
+                        label='postback2',
+                        text='postback text2',
+                        data='action=buy&itemid=2'
+                    ),
+                    MessageTemplateAction(
+                        label='message2',
+                        text='message text2'
+                    ),
+                    URITemplateAction(
+                        label='uri2',
+                        uri='http://example.com/2'
+                    )
+                ]
+            )
+        ]
+
         carousel_template_message = TemplateSendMessage(
             alt_text='Test',
             template=CarouselTemplate(
-                columns=[
-                    CarouselColumn(
-                        thumbnail_image_url='https://example.com/item2.jpg',
-                        title='this is menu1',
-                        text='Tags',
-                        actions=[
-                            URITemplateAction(
-                                label='',
-                                uri=''
-                            ),
-                            PostbackTemplateAction(
-                                label='postback1',
-                                text='postback text1',
-                                data='action=buy&itemid=1'
-                            ),
-                            MessageTemplateAction(
-                                label='message1',
-                                text='message text1'
-                            )
-                        ]
-                    ),
-                    CarouselColumn(
-                        thumbnail_image_url='https://example.com/item2.jpg',
-                        title='this is menu2',
-                        text='description2',
-                        actions=[
-                            PostbackTemplateAction(
-                                label='postback2',
-                                text='postback text2',
-                                data='action=buy&itemid=2'
-                            ),
-                            MessageTemplateAction(
-                                label='message2',
-                                text='message text2'
-                            ),
-                            URITemplateAction(
-                                label='uri2',
-                                uri='http://example.com/2'
-                            )
-                        ]
-                    )
-                ]
+                columns=columns
             )
         )
         text_message = TextSendMessage(text='No result found. Please try different keywords?')
