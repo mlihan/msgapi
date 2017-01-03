@@ -109,9 +109,9 @@ def queryStackOverflow(query):
         for index, item in enumerate(data['items']):
             print str(index) + ':' + str(item)
             temp = CarouselColumn(
-                thumbnail_image_url='https://example.com/item2.jpg',
+                thumbnail_image_url='https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-icon.png',
                 title=item['title'][:36] + '...',
-                text='Tags',
+                text='Tags: ' + item['tags'][0] + ', '+ item['tags'][1] ,
                 actions=[
                     URITemplateAction(
                         label='Go to Article',
@@ -138,12 +138,12 @@ def queryStackOverflow(query):
         return carousel_template_message
     else:
         imagemap_message = ImagemapSendMessage(
-            base_url='https://example.com/base',
-            alt_text='this is an imagemap',
+            base_url='https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-icon.png?v=c78bd457575a',
+            alt_text='This is an imagemap',
             base_size=BaseSize(height=1040, width=1040),
             actions=[
                 URIImagemapAction(
-                    link_uri='https://example.com/',
+                    link_uri='http://www.theodora.com/maps/new9/time_zones_4.jpg',
                     area=ImagemapArea(
                         x=0, y=0, width=520, height=1040
                     )
