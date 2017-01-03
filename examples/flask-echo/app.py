@@ -107,7 +107,7 @@ def queryStackOverflow(query):
     if data['has_more']:
         columns2 = []
         for index, item in enumerate(data['items']):
-            print index + ':' + item
+            print str(index) + ':' + str(item)
             temp = CarouselColumn(
                 thumbnail_image_url='https://example.com/item2.jpg',
                 title='this is menu1',
@@ -183,12 +183,12 @@ def queryStackOverflow(query):
         return carousel_template_message
     else:
         imagemap_message = ImagemapSendMessage(
-            base_url=data['items'][0]['link'],
+            base_url=,
             alt_text='this is an imagemap',
             base_size=BaseSize(height=1040, width=1040),
             actions=[
                 URIImagemapAction(
-                    link_uri=data['items'][0]['link'],
+                    link_uri="http://stackoverflow.com/questions/23526802/heroku-rails-app-terminates-immediately-sigterm",
                     area=ImagemapArea(
                         x=0, y=0, width=520, height=1040
                     )
