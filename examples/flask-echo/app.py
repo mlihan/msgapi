@@ -50,8 +50,8 @@ if channel_access_token is None:
 line_bot_api = LineBotApi(channel_access_token)
 parser = WebhookParser(channel_secret)
 locale = configparser.ConfigParser()
-locale.read('locale.py')
-language = locale['DEFAULT']['language']
+locale.read('locale.ini')
+language = locale.get('DEFAULT', 'language')
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -81,7 +81,7 @@ def callback():
         elif isinstance(event, PostbackEvent):
             # For postback events
             sendMessage = analyzePostbackEvent(event)
-        elif isinstance(event, MessageEvent) and isinstance(event.message, ImageMessage)
+        elif isinstance(event, MessageEvent) and isinstance(event.message, ImageMessage):
             # If user sends an image
             sendMessage = analyzeImageMessage(event)
         else:
@@ -107,10 +107,57 @@ def callback():
     return 'OK'
 
 def analyzeImageMessage(event):
-    
+    carousel_template_message = TemplateSendMessage(
+        alt_text='Carousel template',
+        template=CarouselTemplate(
+            columns=[
+                CarouselColumn(
+                    thumbnail_image_url='https://example.com/item1.jpg',
+                    title='this is menu1',
+                    text='description1',
+                    actions=[
+                        PostbackTemplateAction(
+                            label='postback1',
+                            text='postback text1',
+                            data='action=buy&itemid=1'
+                        ),
+                        MessageTemplateAction(
+                            label='message1',
+                            text='message text1'
+                        ),
+                        URITemplateAction(
+                            label='uri1',
+                            uri='http://example.com/1'
+                        )
+                    ]
+                ),
+                CarouselColumn(
+                    thumbnail_image_url='https://example.com/item2.jpg',
+                    title='this is menu2',
+                    text='description2',
+                    actions=[
+                        PostbackTemplateAction(
+                            label='postback2',
+                            text='postback text2',
+                            data='action=buy&itemid=2'
+                        ),
+                        MessageTemplateAction(
+                            label='message2',
+                            text='message text2'
+                        ),
+                        URITemplateAction(
+                            label='uri2',
+                            uri='http://example.com/2'
+                        )
+                    ]
+                )
+            ]
+        )
+    )
+    return carousel_template_message
 
 def createWelcomeMessage(): 
-    text_message = TextSendMessage(text=locale[language]['Welcome_Message'])
+    text_message = TextSendMessage(text=locale.get(language, 'Welcome_Message'))
     return text_message
 
 def createConfirmMessage():
