@@ -104,35 +104,27 @@ def queryStackOverflow(query):
     response = requests.get(url=url, params=payload)
     data = response.json()
     if data['has_more']:
-        columns = []
-        for index, item in enumerate(data['items']):
-            temp = CarouselColumn(
-                thumbnail_image_url='https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-icon.png?v=c78bd457575a',
-                title=item['title'],
-                text='Tags:' + json.dumps(item['tags']),
-                actions=[
-                    PostbackTemplateAction(
-                        label='postback1',
-                        text='postback text1',
-                        data='action=buy&itemid=1'
-                    ),
-                    MessageTemplateAction(
-                        label='message1',
-                        text='message text1'
-                    ),
-                    URITemplateAction(
-                        label='uri1',
-                        uri='http://example.com/1'
+        
+        imagemap_message = ImagemapSendMessage(
+            base_url=data['items'][0]['link'],
+            alt_text='this is an imagemap',
+            base_size=BaseSize(height=1040, width=1040),
+            actions=[
+                URIImagemapAction(
+                    link_uri=data['items'][0]['link'],
+                    area=ImagemapArea(
+                        x=0, y=0, width=520, height=1040
                     )
-                ]
-            )
-            columns.append(temp)
-        carousel_template_message = TemplateSendMessage(
-            alt_text='This message is only available on your smartphone',
-            template=CarouselTemplate(columns=columns)
+                ),
+                MessageImagemapAction(
+                    text='hello',
+                    area=ImagemapArea(
+                        x=520, y=0, width=520, height=1040
+                    )
+                )
+            ]
         )
-        print carousel_template_message
-        return carousel_template_message
+        return imagemap_message
     else:
         carousel_template_message = TemplateSendMessage(
             alt_text='Test',
@@ -143,13 +135,18 @@ def queryStackOverflow(query):
                         title='this is menu1',
                         text='Tags',
                         actions=[
-                            MessageTemplateAction(
-                                label='message1',
-                                text='message text1'
-                            ),
                             URITemplateAction(
                                 label='uri1',
                                 uri='http://example.com/1'
+                            )
+                            PostbackTemplateAction(
+                                label='postback1',
+                                text='postback text1',
+                                data='action=buy&itemid=1'
+                            ),
+                            MessageTemplateAction(
+                                label='message1',
+                                text='message text1'
                             )
                         ]
                     ),
