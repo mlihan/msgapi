@@ -112,14 +112,17 @@ def queryStackOverflow(query):
                 text='Tags:' + json.dumps(item['tags']),
                 actions=[
                     PostbackTemplateAction(
-                    ),
-                    MessageTemplateAction(
-                        label='message1',
-                        text='message text1'
+                        label='postback1',
+                        text='postback text1',
+                        data='action=buy&itemid=1'
                     ),
                     URITemplateAction(
                         label='Read Article',
                         uri=item['link']
+                    ),
+                    MessageTemplateAction(
+                        label='',
+                        text=''
                     )
                 ]
             )
