@@ -167,7 +167,7 @@ def createConfirmMessage():
             text='Do you want to know who you look like?',
             actions=[
                 PostbackTemplateAction(
-                    label='postback',
+                    label='Yes!',
                     text='Yes!',
                     data='action=y'
                 ),
@@ -182,7 +182,7 @@ def createConfirmMessage():
 
 def analyzePostbackEvent(event):
     print 'postback action: ' + str(event.postback.data)
-    if str(event.postback.data.action) == 'y':
+    if str(event.postback.data) == 'action=y':
         print 'user id: ' + event.user.user_id
         text_message = TextSendMessage(text='That\'s great ' + event.user.user_id + '! Please send me a picture of yourself.')
     return text_message
