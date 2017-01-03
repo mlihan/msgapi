@@ -117,15 +117,15 @@ def queryStackOverflow(query):
                         label='Go to Article',
                         uri=item['link']
                     ),
-                    MessageTemplateAction(
-                        label='Useful',
-                        text='Article ' + str(index) + ' is useful.'
-                    ),
                     PostbackTemplateAction(
-                        label='Not useful',
-                        text='Article ' + str(index) + ' is not useful.',
+                        label='postback1',
+                        text='postback text1',
                         data='action=buy&itemid=1'
                     ),
+                    MessageTemplateAction(
+                        label='This is useful',
+                        text='Article ' + str(index) + ' is useful.'
+                    )
                 ]
             )
             columns2.append(temp)
