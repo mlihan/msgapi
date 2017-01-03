@@ -98,7 +98,7 @@ def queryStackOverflow(query):
         'answers':'1',
         'order':'desc',
         'sort':'relevance',
-        'pagesize':'2',
+        'pagesize':'4',
         'q':query,
         'body':query
     }
@@ -109,23 +109,23 @@ def queryStackOverflow(query):
         for index, item in enumerate(data['items']):
             print str(index) + ':' + str(item)
             temp = CarouselColumn(
-                thumbnail_image_url='https://example.com/item2.jpg',
-                title='this is menu1',
+                thumbnail_image_url='https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-icon.png',
+                title=item['title'],
                 text='Tags',
                 actions=[
                     URITemplateAction(
-                        label='title here',
+                        label='Go to Article',
                         uri=item['link']
                     ),
+                    MessageTemplateAction(
+                        label='Useful',
+                        text='Article ' + str(index) + ' is useful.'
+                    ),
                     PostbackTemplateAction(
-                        label='postback1',
-                        text='postback text1',
+                        label='Not useful',
+                        text='Article ' + str(index) + ' is not useful.',
                         data='action=buy&itemid=1'
                     ),
-                    MessageTemplateAction(
-                        label='message1',
-                        text='message text1'
-                    )
                 ]
             )
             columns2.append(temp)
