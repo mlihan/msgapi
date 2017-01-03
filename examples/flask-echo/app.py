@@ -138,7 +138,7 @@ def queryStackOverflow(query):
                             URITemplateAction(
                                 label='uri1',
                                 uri='http://example.com/1'
-                            )
+                            ),
                             PostbackTemplateAction(
                                 label='postback1',
                                 text='postback text1',
