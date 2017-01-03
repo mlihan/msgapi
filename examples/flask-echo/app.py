@@ -183,7 +183,7 @@ def queryStackOverflow(query):
         return carousel_template_message
     else:
         imagemap_message = ImagemapSendMessage(
-            base_url=,
+            base_url="http://stackoverflow.com/questions",
             alt_text='this is an imagemap',
             base_size=BaseSize(height=1040, width=1040),
             actions=[
