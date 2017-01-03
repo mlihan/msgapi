@@ -173,7 +173,7 @@ def createConfirmMessage():
                 ),
                 MessageTemplateAction(
                     label='About Me',
-                    text='I\'m a bot that searches for a celebrity who looks like you. Try me!'
+                    text='I\'m a bot that searches for a celebrities who look like you. Try me!'
                 )
             ]
         )
@@ -181,8 +181,8 @@ def createConfirmMessage():
     return confirm_template_message
 
 def analyzePostbackEvent(event):
-    print 'postback action: ' + event.postback.data.action
-    if event.postback.data.action == 'y':
+    print 'postback action: ' + str(event.postback.data)
+    if str(event.postback.data.action) == 'y':
         print 'user id: ' + event.user.user_id
         text_message = TextSendMessage(text='That\'s great ' + event.user.user_id + '! Please send me a picture of yourself.')
     return text_message
