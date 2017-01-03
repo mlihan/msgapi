@@ -114,8 +114,8 @@ def queryStackOverflow(query):
                 text='Tags',
                 actions=[
                     URITemplateAction(
-                        label='uri1',
-                        uri='http://example.com/1'
+                        label='title here',
+                        uri=item['link']
                     ),
                     PostbackTemplateAction(
                         label='postback1',
@@ -129,51 +129,6 @@ def queryStackOverflow(query):
                 ]
             )
             columns2.append(temp)
-
-        columns = [
-            CarouselColumn(
-                thumbnail_image_url='https://example.com/item2.jpg',
-                title='this is menu1',
-                text='Tags',
-                actions=[
-                    URITemplateAction(
-                        label='uri1',
-                        uri='http://example.com/1'
-                    ),
-                    PostbackTemplateAction(
-                        label='postback1',
-                        text='postback text1',
-                        data='action=buy&itemid=1'
-                    ),
-                    MessageTemplateAction(
-                        label='message1',
-                        text='message text1'
-                    )
-                ]
-            )
-        ]
-        temp = CarouselColumn(
-            thumbnail_image_url='https://example.com/item2.jpg',
-            title='this is menu2',
-            text='description2',
-            actions=[
-                PostbackTemplateAction(
-                    label='postback2',
-                    text='postback text2',
-                    data='action=buy&itemid=2'
-                ),
-                MessageTemplateAction(
-                    label='message2',
-                    text='message text2'
-                ),
-                URITemplateAction(
-                    label='uri2',
-                    uri='http://example.com/2'
-                )
-            ]
-        )
-        columns.append(temp)
-
         carousel_template_message = TemplateSendMessage(
             alt_text='Test',
             template=CarouselTemplate(
@@ -183,12 +138,12 @@ def queryStackOverflow(query):
         return carousel_template_message
     else:
         imagemap_message = ImagemapSendMessage(
-            base_url='http://stackoverflow.com/questions',
+            base_url='https://example.com/base',
             alt_text='this is an imagemap',
             base_size=BaseSize(height=1040, width=1040),
             actions=[
                 URIImagemapAction(
-                    link_uri="http://stackoverflow.com/questions/23526802/heroku-rails-app-terminates-immediately-sigterm",
+                    link_uri='https://example.com/',
                     area=ImagemapArea(
                         x=0, y=0, width=520, height=1040
                     )
