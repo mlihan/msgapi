@@ -30,7 +30,7 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage, TemplateSendMessage, ImageSendMessage, ImagemapSendMessage,
     ButtonsTemplate, ConfirmTemplate, CarouselTemplate, CarouselColumn, 
     TemplateAction, PostbackTemplateAction, MessageTemplateAction, URITemplateAction, 
-    BaseSize, URIImagemapAction, MessageImagemapAction
+    BaseSize, URIImagemapAction, MessageImagemapAction, ImagemapArea
 )
 
 app = Flask(__name__)
@@ -98,35 +98,38 @@ def queryStackOverflow(query):
         'answers':'1',
         'order':'desc',
         'sort':'relevance',
-        'pagesize':'5',
+        'pagesize':'2',
         'q':query,
         'body':query
     }
     response = requests.get(url=url, params=payload)
     data = response.json()
     if data['has_more']:
-        
-        imagemap_message = ImagemapSendMessage(
-            base_url=data['items'][0]['link'],
-            alt_text='this is an imagemap',
-            base_size=BaseSize(height=1040, width=1040),
-            actions=[
-                URIImagemapAction(
-                    link_uri=data['items'][0]['link'],
-                    area=ImagemapArea(
-                        x=0, y=0, width=520, height=1040
+        columns2 = []
+        for index, item in enumerate(data['items']):
+            print index + ':' + item
+            temp = CarouselColumn(
+                thumbnail_image_url='https://example.com/item2.jpg',
+                title='this is menu1',
+                text='Tags',
+                actions=[
+                    URITemplateAction(
+                        label='uri1',
+                        uri='http://example.com/1'
+                    ),
+                    PostbackTemplateAction(
+                        label='postback1',
+                        text='postback text1',
+                        data='action=buy&itemid=1'
+                    ),
+                    MessageTemplateAction(
+                        label='message1',
+                        text='message text1'
                     )
-                ),
-                MessageImagemapAction(
-                    text='hello',
-                    area=ImagemapArea(
-                        x=520, y=0, width=520, height=1040
-                    )
-                )
-            ]
-        )
-        return imagemap_message
-    else:
+                ]
+            )
+            columns2.append(temp)
+
         columns = [
             CarouselColumn(
                 thumbnail_image_url='https://example.com/item2.jpg',
@@ -147,28 +150,29 @@ def queryStackOverflow(query):
                         text='message text1'
                     )
                 ]
-            ),
-            CarouselColumn(
-                thumbnail_image_url='https://example.com/item2.jpg',
-                title='this is menu2',
-                text='description2',
-                actions=[
-                    PostbackTemplateAction(
-                        label='postback2',
-                        text='postback text2',
-                        data='action=buy&itemid=2'
-                    ),
-                    MessageTemplateAction(
-                        label='message2',
-                        text='message text2'
-                    ),
-                    URITemplateAction(
-                        label='uri2',
-                        uri='http://example.com/2'
-                    )
-                ]
             )
         ]
+        temp = CarouselColumn(
+            thumbnail_image_url='https://example.com/item2.jpg',
+            title='this is menu2',
+            text='description2',
+            actions=[
+                PostbackTemplateAction(
+                    label='postback2',
+                    text='postback text2',
+                    data='action=buy&itemid=2'
+                ),
+                MessageTemplateAction(
+                    label='message2',
+                    text='message text2'
+                ),
+                URITemplateAction(
+                    label='uri2',
+                    uri='http://example.com/2'
+                )
+            ]
+        )
+        columns.append(temp)
 
         carousel_template_message = TemplateSendMessage(
             alt_text='Test',
@@ -176,9 +180,29 @@ def queryStackOverflow(query):
                 columns=columns
             )
         )
-        text_message = TextSendMessage(text='No result found. Please try different keywords?')
-        print carousel_template_message
         return carousel_template_message
+    else:
+        imagemap_message = ImagemapSendMessage(
+            base_url=data['items'][0]['link'],
+            alt_text='this is an imagemap',
+            base_size=BaseSize(height=1040, width=1040),
+            actions=[
+                URIImagemapAction(
+                    link_uri=data['items'][0]['link'],
+                    area=ImagemapArea(
+                        x=0, y=0, width=520, height=1040
+                    )
+                ),
+                MessageImagemapAction(
+                    text='hello',
+                    area=ImagemapArea(
+                        x=520, y=0, width=520, height=1040
+                    )
+                )
+            ]
+        )
+        return imagemap_message
+        
     
 def sendText(text):
     text_message = TextSendMessage(text=text)
