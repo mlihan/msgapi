@@ -143,11 +143,6 @@ def queryStackOverflow(query):
                         title='this is menu1',
                         text='Tags',
                         actions=[
-                            PostbackTemplateAction(
-                                label='postback1',
-                                text='postback text1',
-                                data='action=buy&itemid=1'
-                            ),
                             MessageTemplateAction(
                                 label='message1',
                                 text='message text1'
