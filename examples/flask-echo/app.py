@@ -98,7 +98,7 @@ def queryStackOverflow(query):
         'answers':'1',
         'order':'desc',
         'sort':'relevance',
-        'pagesize':'2',
+        'pagesize':'4',
         'q':query,
         'body':query
     }
@@ -110,7 +110,7 @@ def queryStackOverflow(query):
             print str(index) + ':' + str(item)
             temp = CarouselColumn(
                 thumbnail_image_url='https://example.com/item2.jpg',
-                title=item['title'],
+                title=item['title'][:36] + '...',
                 text='Tags',
                 actions=[
                     URITemplateAction(
@@ -118,13 +118,13 @@ def queryStackOverflow(query):
                         uri=item['link']
                     ),
                     PostbackTemplateAction(
-                        label='postback1',
-                        text='postback text1',
+                        label='Useful',
+                        text='Article ' + str(index) + ' is useful',
                         data='action=buy&itemid=1'
                     ),
                     MessageTemplateAction(
-                        label='message1',
-                        text='message text1'
+                        label='Not useful',
+                        text='Article ' + str(index) + ' is not useful'
                     )
                 ]
             )
