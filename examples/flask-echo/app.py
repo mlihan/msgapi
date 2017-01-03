@@ -90,7 +90,7 @@ def callback():
     return 'OK'
 
 def queryStackOverflow(query):
-    query = query[3:]
+    #query = query[3:]
     url = 'https://api.stackexchange.com/2.2/search/advanced?'
     payload = { 
         'site': 'stackoverflow',
@@ -137,31 +137,10 @@ def queryStackOverflow(query):
         )
         return carousel_template_message
     else:
-        imagemap_message = ImagemapSendMessage(
-            base_url='https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-icon.png?v=c78bd457575a',
-            alt_text='This is an imagemap',
-            base_size=BaseSize(height=1040, width=1040),
-            actions=[
-                URIImagemapAction(
-                    link_uri='http://www.theodora.com/maps/new9/time_zones_4.jpg',
-                    area=ImagemapArea(
-                        x=0, y=0, width=520, height=1040
-                    )
-                ),
-                MessageImagemapAction(
-                    text='hello',
-                    area=ImagemapArea(
-                        x=520, y=0, width=520, height=1040
-                    )
-                )
-            ]
-        )
-        return imagemap_message
+        text_message = TextSendMessage(text='Not found. Please try other keywords.')
+        return text_message
         
     
-def sendText(text):
-    text_message = TextSendMessage(text=text)
-
 def querySearchEngine(data, type):
     index = 0
     app.logger.info("type:" + type) 
