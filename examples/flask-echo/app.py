@@ -16,7 +16,7 @@ from __future__ import unicode_literals
 
 import os
 import sys
-import requests, json
+import requests, json, configparser 
 from argparse import ArgumentParser
 
 from flask import Flask, request, abort
@@ -27,10 +27,12 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, TemplateSendMessage, ImageSendMessage, ImagemapSendMessage,
+    MessageEvent, TextMessage, TextSendMessage, TemplateSendMessage, 
+    ImageMessage, ImageSendMessage, ImagemapSendMessage,
     ButtonsTemplate, ConfirmTemplate, CarouselTemplate, CarouselColumn, 
     TemplateAction, PostbackTemplateAction, MessageTemplateAction, URITemplateAction, 
-    BaseSize, URIImagemapAction, MessageImagemapAction, ImagemapArea
+    BaseSize, URIImagemapAction, MessageImagemapAction, ImagemapArea,
+    FollowEvent, JoinEvent, PostbackEvent
 )
 
 app = Flask(__name__)
@@ -47,7 +49,9 @@ if channel_access_token is None:
 
 line_bot_api = LineBotApi(channel_access_token)
 parser = WebhookParser(channel_secret)
-
+locale = configparser.ConfigParser()
+locale.read('locale.py')
+language = locale['DEFAULT']['language']
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -55,8 +59,6 @@ def callback():
 
     # get request body as text
     body = request.get_data(as_text=True)
-    #app.logger.info("Request body: " + body)
-    #app.logger.info("Signature: " + signature)
 
     # parse webhook body
     try:
@@ -67,30 +69,79 @@ def callback():
     # if event is MessageEvent and message is TextMessage, then check prefix
     for event in events:
         text_message = event.message.text
-        if not isinstance(event, MessageEvent):
-            continue
-        if not isinstance(event.message, TextMessage):
-            continue
-
-        # if prefix is @so, check StackOverflow
-        if text_message.lower().startswith('@so'):
-            sendMessage = queryStackOverflow(text_message)            
-        # if prefix is @go, check 
-        elif text_message.lower().startswith('@go'):
-            # do nothing first
-            sendMessage = None 
+        # For bluemix
+        if isinstance(event, FollowEvent):
+            # If user just added me, send welcome and confirm message
+            sendMessage = []
+            sendMessage.append(createWelcomeMessage())
+            sendMessage.append(createConfirmMessage())
+        elif isinstance(event, JoinEvent):
+            # If user invited me to a group, send confirm message
+            sendMessage = createConfirmMessage()
+        elif isinstance(event, PostbackEvent):
+            # For postback events
+            sendMessage = analyzePostbackEvent(event)
+        elif isinstance(event, MessageEvent) and isinstance(event.message, ImageMessage)
+            # If user sends an image
+            sendMessage = analyzeImageMessage(event)
         else:
             continue
-        a = TemplateSendMessage()
-        a = sendMessage
-        line_bot_api.reply_message(
-            event.reply_token, a
-        )
+
+        # For stackoverflow
+        #if not isinstance(event, MessageEvent):
+        #    continue
+        #if not isinstance(event.message, TextMessage):
+        #    continue
+        # if prefix is @so, check StackOverflow
+        #if text_message.lower().startswith('@so'):
+        #    sendMessage = queryStackOverflow(text_message)            
+        # if prefix is @go, check 
+        #elif text_message.lower().startswith('@go'):
+        #    # do nothing first
+        #    sendMessage = None 
+        #else:
+        #    continue
+
+        line_bot_api.reply_message(event.reply_token, sendMessage)
 
     return 'OK'
 
+def analyzeImageMessage(event):
+    
+
+def createWelcomeMessage(): 
+    text_message = TextSendMessage(text=locale[language]['Welcome_Message'])
+    return text_message
+
+def createConfirmMessage():
+    confirm_template_message = TemplateSendMessage(
+        alt_text='Please check message on your smartphone',
+        template=ConfirmTemplate(
+            text='Do you want to know who you look like?',
+            actions=[
+                PostbackTemplateAction(
+                    label='postback',
+                    text='Yes!',
+                    data='action=y'
+                ),
+                MessageTemplateAction(
+                    label='About Me',
+                    text='I\'m a bot that searches for a celebrity who looks like you. Try me!'
+                )
+            ]
+        )
+    )
+    return confirm_template_message
+
+def analyzePostbackEvent(event):
+    print 'postback action: ' + event.postback.data.action
+    if event.postback.data.action == 'y':
+        print 'user id: ' + event.user.user_id
+        text_message = TextSendMessage(text='That\'s great ' + event.user.user_id + '! Please send me a picture of yourself.')
+    return text_message
+
 def queryStackOverflow(query):
-    #query = query[3:]
+    query = query[3:]
     url = 'https://api.stackexchange.com/2.2/search/advanced?'
     payload = { 
         'site': 'stackoverflow',
