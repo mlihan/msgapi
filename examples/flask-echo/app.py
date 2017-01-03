@@ -98,7 +98,7 @@ def queryStackOverflow(query):
         'answers':'1',
         'order':'desc',
         'sort':'relevance',
-        'pagesize':'4',
+        'pagesize':'2',
         'q':query,
         'body':query
     }
