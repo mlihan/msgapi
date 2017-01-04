@@ -40,18 +40,23 @@ app = Flask(__name__)
 # get channel_secret and channel_access_token from your environment variable
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
+bluemix_api_key = os.getenv('BLUEMIX_API_KEY', None)
+
 if channel_secret is None:
     print('Specify LINE_CHANNEL_SECRET as environment variable.')
     sys.exit(1)
 if channel_access_token is None:
     print('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
     sys.exit(1)
+if bluemix_api_key is None:
+    print('Specify BLUEMIX_API_KEY as environment variable.')
+    sys.exit(1)
 
 line_bot_api = LineBotApi(channel_access_token)
 parser = WebhookParser(channel_secret)
-locale = configparser.ConfigParser()
-locale.read('locale.ini')
-language = locale.get('DEFAULT', 'language')
+config = configparser.ConfigParser()
+config.read('locale.ini')
+language = config.get('DEFAULT', 'language')
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -82,7 +87,8 @@ def callback():
             sendMessage = analyzePostbackEvent(event)
         elif isinstance(event, MessageEvent) and isinstance(event.message, ImageMessage):
             # If user sends an image
-            sendMessage = analyzeImageMessage(event)
+            image_path = getContentImage(event)
+            sendMessage = analyzeImageMessage(imagePath)
         else:
             continue
 
@@ -105,8 +111,40 @@ def callback():
         line_bot_api.reply_message(event.reply_token, sendMessage)
 
     return 'OK'
+def getContentImage(event):
+    message_id = event.message.id
+    message_content = line_bot_api.get_content(message_id)
+    file_path = config.get('DEFAULT', 'Media_Folder') + message_id + '.jpg'
+    with open(file_path, 'wb') as fd:
+        for chunk in message_content.iter_content():
+            fd.write(chunk)
+    app.logger.info( 'image saved in: ' + file_path)
+    return file_path
+    
 
-def analyzeImageMessage(event):
+def analyzeImageMessage(image_path):
+    app.logger.info( str(event))
+    #
+    #call v3/classify check if image is a person
+    classifier_url = config.get('DEFAULT', Bluemix_Page) + '/api/v3/classifiers'
+    payload = { 
+        'version': '2016-05-20',
+        'api_key': bluemix_api_key,
+    }
+    files = { 
+        'image_file': ('filename.jpg', open('filename.jpg', 'rb')) 
+    }
+    response = requests.post(url=url, params=payload, files=files)
+    data = response.json()
+    app.logger.info(response.text)
+    #for index, classifier in enumerate(images[0]['classifiers'])
+    #if not person
+        #send a message your not a person, you're a...
+        #'That's a' + something + ', I can't detect you properly. Can you send a clearer picture of yourself?'
+    #if person
+        #call v3/classify with 
+        #call v3/detect_face
+
     carousel_template_message = TemplateSendMessage(
         alt_text='Carousel template',
         template=CarouselTemplate(
@@ -157,7 +195,7 @@ def analyzeImageMessage(event):
     return carousel_template_message
 
 def createWelcomeMessage(): 
-    text_message = TextSendMessage(text=locale.get(language, 'Welcome_Message'))
+    text_message = TextSendMessage(text=config.get(language, 'Welcome_Message'))
     return text_message
 
 def createConfirmMessage():
@@ -181,9 +219,9 @@ def createConfirmMessage():
     return confirm_template_message
 
 def analyzePostbackEvent(event):
-    print 'postback action: ' + str(event.postback.data)
+    app.logger.info('postback action: ' + str(event.postback.data))
     if str(event.postback.data) == 'action=y':
-        print 'user id: ' + event.user.user_id
+        app.logger.info('user id: ' + event.user.user_id)
         text_message = TextSendMessage(text='That\'s great ' + event.user.user_id + '! Please send me a picture of yourself.')
     return text_message
 
@@ -205,7 +243,7 @@ def queryStackOverflow(query):
     if data['has_more']:
         columns2 = []
         for index, item in enumerate(data['items']):
-            print str(index) + ':' + str(item)
+            app.logger.info(str(index) + ':' + str(item))
             temp = CarouselColumn(
                 thumbnail_image_url='https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-icon.png',
                 title=item['title'][:36] + '...',
