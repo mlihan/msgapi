@@ -76,20 +76,25 @@ def callback():
         # For bluemix
         if isinstance(event, FollowEvent):
             # If user just added me, send welcome and confirm message
+            app.logger.info('FollowEvent')
             sendMessage = []
             sendMessage.append(createWelcomeMessage())
             sendMessage.append(createConfirmMessage())
         elif isinstance(event, JoinEvent):
+            app.logger.info('JoinEvent')
             # If user invited me to a group, send confirm message
             sendMessage = createConfirmMessage()
         elif isinstance(event, PostbackEvent):
+            app.logger.info('PostbackEvent')
             # For postback events
             sendMessage = analyzePostbackEvent(event)
         elif isinstance(event, MessageEvent) and isinstance(event.message, ImageMessage):
+            app.logger.info('MessageEvent')
             # If user sends an image
             image_path = getContentImage(event)
             sendMessage = analyzeImageMessage(imagePath)
         else:
+            app.logger.info('none:' + str(event))
             continue
 
         # For stackoverflow
