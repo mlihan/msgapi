@@ -114,7 +114,7 @@ def getContentImage(event):
     app.logger.info(str(event))
     message_id = event.message.id
     message_content = line_bot_api.get_message_content(message_id)
-    file_path = str(config.get('DEFAULT', 'Media_Folder')) 
+    file_path = os.path.join(config.get('DEFAULT', 'Media_Folder'), message_id + '.jpg')
     with open(file_path, 'wb') as fd:
         for chunk in message_content.iter_content():
             fd.write(chunk)
