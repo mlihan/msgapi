@@ -64,7 +64,6 @@ def callback():
 
     # get request body as text
     body = request.get_data(as_text=True)
-
     # parse webhook body
     try:
         events = parser.parse(body, signature)
@@ -76,25 +75,20 @@ def callback():
         # For bluemix
         if isinstance(event, FollowEvent):
             # If user just added me, send welcome and confirm message
-            app.logger.info('FollowEvent')
             sendMessage = []
             sendMessage.append(createWelcomeMessage())
             sendMessage.append(createConfirmMessage())
         elif isinstance(event, JoinEvent):
-            app.logger.info('JoinEvent')
             # If user invited me to a group, send confirm message
             sendMessage = createConfirmMessage()
         elif isinstance(event, PostbackEvent):
-            app.logger.info('PostbackEvent')
             # For postback events
             sendMessage = analyzePostbackEvent(event)
         elif isinstance(event, MessageEvent) and isinstance(event.message, ImageMessage):
-            app.logger.info('MessageEvent')
             # If user sends an image
             image_path = getContentImage(event)
             sendMessage = analyzeImageMessage(imagePath)
         else:
-            app.logger.info('none:' + str(event))
             continue
 
         # For stackoverflow
@@ -117,9 +111,10 @@ def callback():
 
     return 'OK'
 def getContentImage(event):
+    app.logger.info(str(event))
     message_id = event.message.id
-    message_content = line_bot_api.get_content(message_id)
-    file_path = config.get('DEFAULT', 'Media_Folder') + message_id + '.jpg'
+    message_content = line_bot_api.get_message_content(message_id)
+    file_path = config.get('DEFAULT', 'Media_Folder') + '/' + message_id + '.jpg'
     with open(file_path, 'wb') as fd:
         for chunk in message_content.iter_content():
             fd.write(chunk)
