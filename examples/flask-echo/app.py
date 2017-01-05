@@ -19,6 +19,8 @@ import sys
 import requests, json, configparser 
 from argparse import ArgumentParser
 
+import image_management 
+
 from flask import Flask, request, abort
 from linebot import (
     LineBotApi, WebhookParser
@@ -86,8 +88,8 @@ def callback():
             sendMessage = analyzePostbackEvent(event)
         elif isinstance(event, MessageEvent) and isinstance(event.message, ImageMessage):
             # If user sends an image
-            image_path = getContentImage(event)
-            sendMessage = analyzeImageMessage(imagePath)
+            image_url = saveContentImage(event)
+            sendMessage = analyzeImageMessage(image_url)
         else:
             continue
 
@@ -110,20 +112,22 @@ def callback():
         line_bot_api.reply_message(event.reply_token, sendMessage)
 
     return 'OK'
-def getContentImage(event):
-    app.logger.info(str(event))
-    message_id = event.message.id
-    message_content = line_bot_api.get_message_content(message_id)
-    file_path = os.path.join(config.get('DEFAULT', 'Media_Folder'), message_id + '.jpg')
-    with open(file_path, 'wb') as fd:
-        for chunk in message_content.iter_content():
-            fd.write(chunk)
-    app.logger.info( 'image saved in: ' + file_path)
-    return file_path
-    
 
-def analyzeImageMessage(image_path):
-    app.logger.info( str(event))
+def saveContentImage(event):
+    app.logger.info(str(event))
+    message_content = line_bot_api.get_message_content(event.message.id)
+    image_binary = message_content.content 
+
+    # save image to cloudinary
+    fp = open("temp_img", 'wb') 
+    fp.write(image_binary)
+    fp.close
+    image_url = image_management.upload('temp_img')
+
+    return image_url
+
+def analyzeImageMessage(image_url):
+    app.logger.info( str(image_url))
     #
     #call v3/classify check if image is a person
     classifier_url = config.get('DEFAULT', Bluemix_Page) + '/api/v3/classifiers'
