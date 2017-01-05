@@ -106,7 +106,6 @@ def callback():
                 app.logger.info('not human but a type_class: ' + type_class)
                 text = "Is that a " + type_class + "? If I'm mistaken, please use SELFIE to take a picture of yourself."
                 sendMessage = TextSendMessage(text=text)
-
         else:
             continue
 
