@@ -15,7 +15,7 @@ def addRecord(celeb_id, en_name, local_name=None, zh_name=None, sex, age=None, c
     	'zh_name':zh_name, 
     	'sex':sex,
     	'age':age,
-    	'country':country
+    	'country':country,
     	'image_url':image_url,
     	'message_id':message_id
     }
