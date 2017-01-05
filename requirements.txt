@@ -6,4 +6,4 @@ line-bot-sdk
 configparser
 watson-developer-cloud
 uploader
-CloudinaryImage
+cloudinary
