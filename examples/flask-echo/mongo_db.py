@@ -7,7 +7,7 @@ client = MongoClient(mongodb_path)
 
 celeb_collection = client.heroku_lsms3n9l.celebs
 
-def addRecord(celeb_id, en_name, local_name=None, zh_name=None, sex, age=None, country, image_url, message_id=None):
+def addRecord(celeb_id, en_name, sex, country, image_url, local_name=None, zh_name=None,  age=None, message_id=None):
     record = {
     	'celeb_id':celeb_id,
     	'name_id':name_id,
