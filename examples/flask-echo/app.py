@@ -17,6 +17,7 @@ from __future__ import unicode_literals
 import os
 import sys
 import requests, json, configparser 
+import urllib
 from argparse import ArgumentParser
 
 import image_management 
@@ -89,7 +90,7 @@ def callback():
         elif isinstance(event, MessageEvent) and isinstance(event.message, ImageMessage):
             # If user sends an image
             image_url = saveContentImage(event)
-            sendMessage = analyzeImageMessage(image_url)
+            sendMessage = classifyImageMessage(image_url)
         else:
             continue
 
@@ -113,6 +114,7 @@ def callback():
 
     return 'OK'
 
+# Save image to cloudinary 
 def saveContentImage(event):
     app.logger.info(str(event))
     message_content = line_bot_api.get_message_content(event.message.id)
@@ -126,7 +128,8 @@ def saveContentImage(event):
 
     return image_url
 
-def analyzeImageMessage(image_url):
+# Classify image in Bluemix
+def classifyImageMessage(image_url):
     app.logger.info( str(image_url))
     #
     #call v3/classify check if image is a person
@@ -135,8 +138,9 @@ def analyzeImageMessage(image_url):
         'version': '2016-05-20',
         'api_key': bluemix_api_key,
     }
+    urllib.urlretrieve(image_url, "tmp_image.jpg")
     files = { 
-        'image_file': ('filename.jpg', open('filename.jpg', 'rb')) 
+        'image_file': ('tmp_image.jpg', open('tmp_image.jpg', 'rb')) 
     }
     response = requests.post(url=url, params=payload, files=files)
     data = response.json()
