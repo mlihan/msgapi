@@ -91,7 +91,18 @@ def callback():
         elif isinstance(event, MessageEvent) and isinstance(event.message, ImageMessage):
             # If user sends an image
             image_url = saveContentImage(event)
-            sendMessage = classifyImageMessage(image_url)
+            isPerson, data = classifyImageMessage(image_url)
+            
+            #if not person
+                #send a message your not a person, you're a...
+                #'That's a' + something + ', I can't detect you properly. Can you send a clearer picture of yourself?'
+            #if person
+                #call v3/classify with 
+                #call v3/detect_face
+            if isPerson:
+                sendMessage = createMessageTemplate(data)
+            else:
+
         else:
             continue
 
@@ -132,9 +143,9 @@ def saveContentImage(event):
 # Classify image in Bluemix
 def classifyImageMessage(image_url):
     app.logger.info('classifying image: ' + image_url)
-
+    app.logger.info('current path:' + str(os.path.dirname(os.path.realpath(__file__))))
     #call v3/classify check if image is a person
-    classifier_url = config.get('DEFAULT', 'Bluemix_Page') + '/api/v3/classifiers'
+    classifier_url = config.get('DEFAULT', 'Bluemix_Page') + '/api/v3/classify'
     app.logger.info('classifier_url: ' + classifier_url)
     payload = { 
         'version': '2016-05-20',
@@ -142,20 +153,23 @@ def classifyImageMessage(image_url):
     }
     urllib.urlretrieve(image_url, "tmp_image.jpg")
     files = { 
-        'image_file': ('tmp_image.jpg', open('tmp_image.jpg', 'rb')) 
+        'image_file': open('tmp_image.jpg', 'rb'), 
+        'parameters': open(config.get('DEFAULT', 'Bluemix_jsonpath'), 'rb')
     }
     response = requests.post(url=classifier_url, params=payload, files=files)
     data = response.json()
     app.logger.info(response.text)
 
+    isPerson = 'person' in response.text
+    app.logger.info('isPerson' + str(isPerson))
+
     # 
     #for index, classifier in enumerate(data['images'][0]['classifiers'])
-    #if not person
-        #send a message your not a person, you're a...
-        #'That's a' + something + ', I can't detect you properly. Can you send a clearer picture of yourself?'
-    #if person
-        #call v3/classify with 
-        #call v3/detect_face
+    
+
+    return isPerson, data
+
+def createMessageTemplate(data):
 
     carousel_template_message = TemplateSendMessage(
         alt_text='Carousel template',
