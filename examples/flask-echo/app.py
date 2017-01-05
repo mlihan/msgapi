@@ -130,7 +130,7 @@ def analyzeImageMessage(image_url):
     app.logger.info( str(image_url))
     #
     #call v3/classify check if image is a person
-    classifier_url = config.get('DEFAULT', Bluemix_Page) + '/api/v3/classifiers'
+    classifier_url = config.get('DEFAULT', 'Bluemix_Page') + '/api/v3/classifiers'
     payload = { 
         'version': '2016-05-20',
         'api_key': bluemix_api_key,
