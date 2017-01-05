@@ -121,8 +121,8 @@ def saveContentImage(event):
     # save image to cloudinary
     fp = open("temp_img", 'wb') 
     fp.write(image_binary)
-    fp.close
-    image_url = image_management.upload('temp_img')
+    fp.close()
+    image_url, image_id = image_management.upload(event.message.id, 'temp_img')
 
     return image_url
 
