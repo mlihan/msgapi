@@ -7,4 +7,3 @@ configparser
 watson-developer-cloud
 uploader
 cloudinary
-urllib
