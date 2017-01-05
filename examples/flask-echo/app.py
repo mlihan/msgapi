@@ -102,6 +102,10 @@ def callback():
             if isPerson:
                 sendMessage = createMessageTemplate(data)
             else:
+                type_class = data['images'][0]['classifiers'][0]['classes'][0]['class']
+                app.logger.info('not human but a type_class: ' + type_class)
+                text = "Is that a " + type_class + "? If I'm mistaken, please use SELFIE to take a picture of yourself."
+                sendMessage = TextSendMessage(text=text)
 
         else:
             continue
