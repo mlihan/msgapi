@@ -18,6 +18,7 @@ import os
 import sys
 import requests, json, configparser 
 import urllib
+import mongo_db
 from argparse import ArgumentParser
 
 import image_management 
@@ -145,7 +146,8 @@ def classifyImageMessage(image_url):
     response = requests.post(url=url, params=payload, files=files)
     data = response.json()
     app.logger.info(response.text)
-    #for index, classifier in enumerate(images[0]['classifiers'])
+    # 
+    #for index, classifier in enumerate(data['images'][0]['classifiers'])
     #if not person
         #send a message your not a person, you're a...
         #'That's a' + something + ', I can't detect you properly. Can you send a clearer picture of yourself?'
