@@ -131,11 +131,11 @@ def saveContentImage(event):
 
 # Classify image in Bluemix
 def classifyImageMessage(image_url):
-    app.logger.info('classifying image: ' + image_url))
+    app.logger.info('classifying image: ' + image_url)
 
     #call v3/classify check if image is a person
     classifier_url = config.get('DEFAULT', 'Bluemix_Page') + '/api/v3/classifiers'
-    app.logger.info('classifier_url: ' + classifier_url))
+    app.logger.info('classifier_url: ' + classifier_url)
     payload = { 
         'version': '2016-05-20',
         'api_key': bluemix_api_key,
@@ -147,6 +147,7 @@ def classifyImageMessage(image_url):
     response = requests.post(url=classifier_url, params=payload, files=files)
     data = response.json()
     app.logger.info(response.text)
+
     # 
     #for index, classifier in enumerate(data['images'][0]['classifiers'])
     #if not person
