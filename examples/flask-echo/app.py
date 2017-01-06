@@ -107,7 +107,7 @@ def callback():
             if not isCelebrity:
                 isPerson = 'person' in json.dumps(classifiers)
 
-            app.logger.info('isCelebrity: ' + isCelebrity + ' isPerson:' + isPerson)
+            app.logger.info('isCelebrity: ' + str(isCelebrity) + ' isPerson:' + str(isPerson))
             # 2 a celebrity look alike, send a template message carousel
             if isCelebrity:
                 sendMessage = createMessageTemplate(classifiers)
