@@ -104,9 +104,8 @@ def callback():
                 return 'OK'
 
             isCelebrity = len(classifiers) > 1
-            if not isCelebrity:
-                isPerson = 'person' in json.dumps(classifiers)
-
+            isPerson = 'person' in json.dumps(classifiers)
+            
             app.logger.info('isCelebrity: ' + str(isCelebrity) + ' isPerson:' + str(isPerson))
             # 2 a celebrity look alike, send a template message carousel
             if isCelebrity:
