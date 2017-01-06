@@ -17,11 +17,11 @@ from __future__ import unicode_literals
 import os
 import sys
 import requests, json, configparser 
-import urllib
 import mongo_db
-from argparse import ArgumentParser
-
 import image_management 
+
+from argparse import ArgumentParser
+from watson_developer_cloud import VisualRecognitionV3
 
 from flask import Flask, request, abort
 from linebot import (
@@ -56,6 +56,7 @@ if bluemix_api_key is None:
     print('Specify BLUEMIX_API_KEY as environment variable.')
     sys.exit(1)
 
+visual_recognition = VisualRecognitionV3('2016-05-20', api_key=bluemix_api_key)
 line_bot_api = LineBotApi(channel_access_token)
 parser = WebhookParser(channel_secret)
 config = configparser.ConfigParser()
@@ -89,22 +90,36 @@ def callback():
             # For postback events
             sendMessage = analyzePostbackEvent(event)
         elif isinstance(event, MessageEvent) and isinstance(event.message, ImageMessage):
-            # If user sends an image
+            # If user sends an image, save content
             image_url = saveContentImage(event)
-            isPerson, data = classifyImageMessage(image_url)
-            
-            #if not person
-                #send a message your not a person, you're a...
-                #'That's a' + something + ', I can't detect you properly. Can you send a clearer picture of yourself?'
-            #if person
+            # classify the image 
+            classifiers = classifyImageMessage(image_url)
+
+            # After classification reply the following to user
+            # 1 no classifier found, send a text message
+            if classifiers is None:
+                sendMessage = TextSendMessage(text='I\'m sorry but your image is out of this world.')
+                line_bot_api.reply_message(event.reply_token, sendMessage)
+                return
+
+            isCelebrity = len(classifiers) > 1
+            if not isCelebrity:
+                isPerson = 'person' in classifiers.values()
+
+            app.logger.info('isCelebrity: ' + isCelebrity + ' isPerson:' + isPerson)
+            # 2 a celebrity look alike, send a template message carousel
+            if isCelebrity:
+                sendMessage = createMessageTemplate(classifiers)
+            # TODO: 3 a person, call detect_face send a single template message, 
+            elif isPerson:
+                sendMessage = TextSendMessage(text='You don\'t look like any celebrities')
                 #call v3/classify with 
                 #call v3/detect_face
-            if isPerson:
-                sendMessage = createMessageTemplate(data)
+            # 4 others. send a text message
             else:
-                type_class = data['images'][0]['classifiers'][0]['classes'][0]['class']
+                type_class = classifiers[0]['classes'][0]['class']
                 app.logger.info('not human but a type_class: ' + type_class)
-                text = "Is that a " + type_class + "? If I'm mistaken, please use SELFIE to take a picture of yourself."
+                text = "Is that a " + type_class + "? If I'm mistaken, please take a clearer picture of yourself."
                 sendMessage = TextSendMessage(text=text)
         else:
             continue
@@ -145,31 +160,25 @@ def saveContentImage(event):
 
 # Classify image in Bluemix
 def classifyImageMessage(image_url):
-    app.logger.info('user\'s image: ' + image_url)
-    #call v3/classify check if image is a person
-    classifier_url = config.get('DEFAULT', 'Bluemix_Page') + '/api/v3/classify'
-    app.logger.info('classify_url: ' + classifier_url)
-    payload = { 
-        'version': '2016-05-20',
-        'api_key': bluemix_api_key,
-    }
-    urllib.urlretrieve(image_url, "tmp_image.jpg")
-    files = { 
-        'image_file': open('tmp_image.jpg', 'rb'), 
-        'parameters': open(config.get('DEFAULT','Bluemix_JSON'), 'rb')
-    }
-    response = requests.post(url=classifier_url, params=payload, files=files)
-    data = response.json()
-    app.logger.info(response.text)
+    #initialize v3/classify
+    classifier = config.get('DEFAULT', 'Bluemix_Classifier')
+    threshold = config.get('DEFAULT', 'Bluemix_Threshold')
+    app.logger.info('classifier: ' + classifier)
 
-    isPerson = 'person' in response.text
-    app.logger.info('isPerson' + str(isPerson))
+    #call v3/classify
+    response = visual_recognition.classify(
+        images_url=image_url,
+        classifier_ids=[classifier, 'default'], 
+        threshold=threshold
+        )
+    app.logger.info(json.dumps(response, indent=2))
 
-    # 
-    #for index, classifier in enumerate(data['images'][0]['classifiers'])
+    # check if celebrity is detected in the image
+    if not 'classifers' in response:
+        return None
     
-
-    return isPerson, data
+    classifiers = response['images'][0]['classifiers']
+    return classifiers
 
 def createMessageTemplate(data):
 
