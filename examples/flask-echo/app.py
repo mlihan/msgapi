@@ -97,7 +97,7 @@ def callback():
 
             # After classification reply the following to user
             # 1 no classifier found, send a text message
-            if classifiers is None:
+            if classifiers == 0:
                 app.logger.info('no classifier!!')
                 sendMessage = TextSendMessage(text='I\'m sorry but your image is out of this world.')
                 line_bot_api.reply_message(event.reply_token, sendMessage)
@@ -176,7 +176,7 @@ def classifyImageMessage(image_url):
 
     # check if celebrity is detected in the image
     if not 'classifers' in response:
-        return None
+        return 0
     
     classifiers = response['images'][0]['classifiers']
     return classifiers
