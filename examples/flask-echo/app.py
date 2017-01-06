@@ -174,12 +174,11 @@ def classifyImageMessage(image_url):
         )
     app.logger.info(json.dumps(response, indent=2))
 
-    # check if celebrity is detected in the image
-    if not 'classifers' in response:
+    # check if a classifier is detected in the image
+    if 'classifiers' in json.dumps(response):
+        return response['images'][0]['classifiers']
+    else:
         return 0
-    
-    classifiers = response['images'][0]['classifiers']
-    return classifiers
 
 def createMessageTemplate(data):
 
