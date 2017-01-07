@@ -111,7 +111,7 @@ def callback():
 
             # 2 a person and celebrity look alike, send a template message carousel
             if isCelebrity and isPerson:
-                sendMessage = createMessageTemplate(classifiers)
+                sendMessage = createMessageTemplate('marc', classifiers)
             # 3 a celebrity lookalike but not a person
             elif isCelebrity:
                 type_class = classifiers[0]['classes'][1]['class']
