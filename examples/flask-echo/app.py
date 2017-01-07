@@ -203,13 +203,14 @@ def createMessageTemplate(user, classifiers):
         columns.append(temp)
     celeb_class = classifiers[0]['classes'][0]
     celeb = celeb_db.findRecordWithId(celeb_class['class'])
+    score = computeScore(celeb_class['score'])
     index = 0
     carousel_template_message = TemplateSendMessage(
         alt_text='test', #user + ' has is a celebrity look alike! Please check your smartphone',
         template=CarouselTemplate(columns=[CarouselColumn(
-                thumbnail_image_url='https://example.com/item1.jpg',
-                title='this is menu1',
-                text='description1',
+                thumbnail_image_url=celeb['image_url'],
+                title=title[:39],
+                text='Score: ' + score + '%',
                 actions=[
                     PostbackTemplateAction(
                         label='Agree',
