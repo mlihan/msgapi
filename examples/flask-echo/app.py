@@ -77,13 +77,13 @@ def callback():
     except InvalidSignatureError:
         abort(500)
 
-    # if event is MessageEvent and message is TextMessage, then check prefix
+    # analyze incoming events 
     for event in events:
         # For bluemix
         if isinstance(event, FollowEvent):
             # If user just added me, send welcome and confirm message
             sendMessage = []
-            sendMessage.append(createWelcomeMessage())
+            sendMessage.append(createWelcomeMessage(event.source.userId))
             sendMessage.append(createConfirmMessage())
         elif isinstance(event, JoinEvent):
             # If user invited me to a group, send confirm message
@@ -140,17 +140,20 @@ def callback():
 
 # Save image to cloudinary 
 def saveContentImage(event):
-    app.logger.info(str(event))
-    message_content = line_bot_api.get_message_content(event.message.id)
-    image_binary = message_content.content 
+    #app.logger.info(str(event))
+    try:
+        message_content = line_bot_api.get_message_content(event.message.id)
+        image_binary = message_content.content 
 
-    # save image to cloudinary
-    fp = open("temp_img", 'wb') 
-    fp.write(image_binary)
-    fp.close()
-    image_url, image_id = image_management.upload(event.message.id, 'temp_img')
-
-    return image_url
+        # save image to cloudinary
+        fp = open("temp_img", 'wb') 
+        fp.write(image_binary)
+        fp.close()
+        image_url, image_id = image_management.upload(event.message.id, 'temp_img')
+        return image_url
+    except:
+        app.logger.error("Unexpected error:" + sys.exc_info()[0])
+        return 'NG'
 
 # Classify image in Bluemix
 def classifyImageMessage(image_url):
@@ -250,69 +253,6 @@ def analyzePostbackEvent(event):
     elif 'action=agree' in str(event.postback.data):
         sendMessage = createConfirmMessage('Thank you ' + event.user.display_name + '. ')
     return sendMessage
-
-# query stackoverflow
-def queryStackOverflow(query):
-    query = query[3:]
-    url = 'https://api.stackexchange.com/2.2/search/advanced?'
-    payload = { 
-        'site': 'stackoverflow',
-        'views':'200',
-        'answers':'1',
-        'order':'desc',
-        'sort':'relevance',
-        'pagesize':'4',
-        'q':query,
-        'body':query
-    }
-    response = requests.get(url=url, params=payload)
-    data = response.json()
-    if data['has_more']:
-        columns2 = []
-        for index, item in enumerate(data['items']):
-            app.logger.info(str(index) + ':' + str(item))
-            temp = CarouselColumn(
-                thumbnail_image_url='https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-icon.png',
-                title=item['title'][:36] + '...',
-                text='Tags: ' + item['tags'][0] + ', '+ item['tags'][1] ,
-                actions=[
-                    URITemplateAction(
-                        label='Go to Article',
-                        uri=item['link']
-                    ),
-                    PostbackTemplateAction(
-                        label='Useful',
-                        text='Article ' + str(index) + ' is useful',
-                        data='action=buy&itemid=1'
-                    ),
-                    MessageTemplateAction(
-                        label='Not useful',
-                        text='Article ' + str(index) + ' is not useful'
-                    )
-                ]
-            )
-            columns2.append(temp)
-        carousel_template_message = TemplateSendMessage(
-            alt_text='Test',
-            template=CarouselTemplate(
-                columns=columns2
-            )
-        )
-        return carousel_template_message
-    else:
-        text_message = TextSendMessage(text='Not found. Please try other keywords.')
-        return text_message
-        
-    
-def querySearchEngine(data, type):
-    index = 0
-    app.logger.info("type:" + type) 
-    template = ImageSendMessage(
-                original_content_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg',
-                preview_image_url='https://upload.wikimedia.org/wikipedia/commons/b/b4/JPEG_example_JPG_RIP_100.jpg'
-                )
-    return template
-
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser(
