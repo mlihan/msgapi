@@ -105,7 +105,7 @@ def callback():
 
             isCelebrity = len(classifiers) > 1
             celeb_confidence = classifiers[0]['classes'][0]['score']
-            isPerson = 'person' in json.dumps(classifiers) and celeb_confidence > 0.6
+            isPerson = 'person' in json.dumps(classifiers) or celeb_confidence > 0.6
             
             app.logger.info('isCelebrity: ' + str(isCelebrity) + ' isPerson:' + str(isPerson) + ' confidence:' + str(celeb_confidence) )
 
