@@ -81,17 +81,24 @@ def callback():
     for event in events:
         # For bluemix
         if isinstance(event, FollowEvent):
+            app.logger.info('event FollowEvent: ' + str(event) )
+
             # If user just added me, send welcome and confirm message
             sendMessage = []
             sendMessage.append(createWelcomeMessage(event.source.userId))
             sendMessage.append(createConfirmMessage())
         elif isinstance(event, JoinEvent):
+            app.logger.info('event JoinEvent: ' + str(event) )
+
             # If user invited me to a group, send confirm message
             sendMessage = createConfirmMessage()
         elif isinstance(event, PostbackEvent):
+            app.logger.info('event PostbackEvent: ' + str(event) )
             # For postback events
             sendMessage = analyzePostbackEvent(event)
         elif isinstance(event, MessageEvent) and isinstance(event.message, ImageMessage):
+            app.logger.info('event MessageEvent(Image): ' + str(event) )
+
             # If user sends an image, save content
             image_url = saveContentImage(event)
             # classify the image 
@@ -247,11 +254,10 @@ def computeScore(json_score):
 
 # analyze postback action
 def analyzePostbackEvent(event):
-    app.logger.info('postback action: ' + str(event) )
     if str(event.postback.data) == 'action=tryme':
         sendMessage = TextSendMessage(text='That\'s great ' + event.user.user_id + '! Please send me a picture of yourself.')
     elif 'action=agree' in str(event.postback.data):
-        sendMessage = createConfirmMessage('Thank you ' + event.user.display_name + '. ')
+        sendMessage = createConfirmMessage('Thank you ' + event.source.userId + '. ')
     return sendMessage
 
 if __name__ == "__main__":
