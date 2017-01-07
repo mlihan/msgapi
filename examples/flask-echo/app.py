@@ -227,11 +227,11 @@ def createWelcomeMessage():
     return text_message
 
 # create a confirm message
-def createConfirmMessage(init_text=None):
+def createConfirmMessage():
     confirm_template_message = TemplateSendMessage(
         alt_text='Please check message on your smartphone',
         template=ConfirmTemplate(
-            text=init_text + 'Do you want to know which celebrity you look like?',
+            text='Do you want to know which celebrity you look like?',
             actions=[
                 PostbackTemplateAction(
                     label='Yes!',
