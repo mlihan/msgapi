@@ -22,8 +22,8 @@ def addRecord(celeb_id, en_name, sex, country, image_url, local_name=None, zh_na
     celeb_collection.insert_one(record)
 
 def findRecordWithId(celeb_id):
-    print 'record checking ' + celeb_id
-    return celeb_collection.find_one({'celeb_id':celeb_id})
+    print 'record checking ' + celeb_id.lower()
+    return celeb_collection.find_one({'celeb_id':celeb_id.lower()})
 
 def findRecordWithName(en_name):
     return celeb_collection.find_one({'en_name': name})
