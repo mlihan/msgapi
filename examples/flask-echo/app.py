@@ -45,6 +45,8 @@ app = Flask(__name__)
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
 bluemix_api_key = os.getenv('BLUEMIX_API_KEY', None)
+oa_id = os.getenv('OA_ID', None)
+bluemix_classifier = os.getenv('BLUEMIX_CLASSIFIER', None)
 
 if channel_secret is None:
     print('Specify LINE_CHANNEL_SECRET as environment variable.')
@@ -153,13 +155,12 @@ def saveContentImage(event):
 # Classify image in Bluemix
 def classifyImageMessage(image_url):
     #initialize v3/classify
-    classifier = config.get('DEFAULT', 'Bluemix_Classifier')
     threshold = config.get('DEFAULT', 'Bluemix_Threshold')
     
     #call v3/classify
     response = visual_recognition.classify(
         images_url=image_url,
-        classifier_ids=[classifier, 'default'], 
+        classifier_ids=[bluemix_classifier, 'default'], 
         threshold=threshold
         )
     app.logger.info(json.dumps(response, indent=2))
@@ -186,16 +187,16 @@ def createMessageTemplate(user, classifiers):
             actions=[
                 PostbackTemplateAction(
                     label='Agree',
-                    text= 'I agree that ', # + user + ' looks like ' + celeb['local_name'],
+                    text= 'I agree that ' + user + ' looks like ' + celeb['local_name'],
                     data='action=agree&text=' + str(index)
                 ),
                 MessageTemplateAction(
                     label='Disagree',
-                    text='I think ' #+ user + ' is ' + compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
+                    text='I think ' + user + ' is ' + compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
                 ),
                 URITemplateAction(
-                    label='Share',
-                    uri='http://example.com/1'
+                    label='Share to friends',
+                    uri='line://nv/recommendOA/@' + oa_id
                 )
             ]
         )
@@ -243,7 +244,7 @@ def computeScore(json_score):
 
 # analyze postback action
 def analyzePostbackEvent(event):
-    app.logger.info('postback action: ' + str(event) + ' ' + event.user.display_name)
+    app.logger.info('postback action: ' + str(event) )
     if str(event.postback.data) == 'action=tryme':
         sendMessage = TextSendMessage(text='That\'s great ' + event.user.user_id + '! Please send me a picture of yourself.')
     elif 'action=agree' in str(event.postback.data):
