@@ -173,37 +173,41 @@ def classifyImageMessage(image_url):
 # Create a carouse message template if user looks like a celebrity
 def createMessageTemplate(user, classifiers):
     columns = []
-    for index, celeb_class in enumerate(classifiers[0]['classes']):
-        celeb = celeb_db.findRecordWithId(celeb_class['class'])
-        app.logger.info(str(celeb))
-        score = computeScore(celeb_class['score'])
-        app.logger.info('Carousel index:' + str(index) + ' for ' + str(celeb['en_name']) + ' score: ' + str(score))
-        title = user + ' looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
-        app.logger.info(celeb['image_url'] + title[:39] + ' ' + celeb['local_name'] + compliment.getRandomCompliment(celeb['sex']))
-        temp = CarouselColumn(
-            thumbnail_image_url=celeb['image_url'],
-            title=title[:39],
-            text='Score: ' + score + '%',
-            actions=[
-                PostbackTemplateAction(
-                    label='Agree',
-                    text= 'I agree that ',# + user + ' looks like ' + celeb['local_name'],
-                    data='action=agree&text=' + str(index)
-                ),
-                MessageTemplateAction(
-                    label='Disagree',
-                    text='I think ' #+ user + ' is ' + compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
-                ),
-                URITemplateAction(
-                    label='Share',
-                    uri='http://example.com/1'
-                )
-            ]
-        )
-        columns.append(temp)
+    #for index, celeb_class in enumerate(classifiers[0]['classes']):
+    index = 1
+    celeb_class = classifiers[0]['classes'][0]
+    celeb = celeb_db.findRecordWithId(celeb_class['class'])
+    app.logger.info(str(celeb))
+    score = computeScore(celeb_class['score'])
+    app.logger.info('Carousel index:' + str(index) + ' for ' + str(celeb['en_name']) + ' score: ' + str(score))
+    title = user + ' looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
+    
+    app.logger.info(celeb['image_url'] + title[:39] + ' ' + celeb['local_name'] + compliment.getRandomCompliment(celeb['sex']))
+    
+    temp = CarouselColumn(
+        thumbnail_image_url=celeb['image_url'],
+        title=title[:39],
+        text='Score: ' + score + '%',
+        actions=[
+            PostbackTemplateAction(
+                label='Agree',
+                text= 'I agree that ' + user + ' looks like ' + celeb['local_name'],
+                data='action=agree&text=' + str(index)
+            ),
+            MessageTemplateAction(
+                label='Disagree',
+                text='I think ' + user + ' is ' + compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
+            ),
+            URITemplateAction(
+                label='Share',
+                uri='http://example.com/1'
+            )
+        ]
+    )
+    columns.append(temp)
     
     carousel_template_message = TemplateSendMessage(
-        alt_text= user + ' has is a celebrity look alike! Please check your smartphone',
+        alt_text=user + ' has is a celebrity look alike! Please check your smartphone',
         template=CarouselTemplate(columns=columns)
     )
     return carousel_template_message
