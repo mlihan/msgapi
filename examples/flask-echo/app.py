@@ -187,8 +187,8 @@ def createMessageTemplate(user, classifiers):
             actions=[
                 PostbackTemplateAction(
                     label='Agree',
-                    text= user + ' looks like ' + celeb['local_name'],
-                    data='action=agree&text=' + index
+                    text= 'I agree that '+ user + ' looks like ' + celeb['local_name'],
+                    data='action=agree&text=' + str(index)
                 ),
                 MessageTemplateAction(
                     label='Disagree',
@@ -214,11 +214,11 @@ def createWelcomeMessage():
     return text_message
 
 # create a confirm message
-def createConfirmMessage():
+def createConfirmMessage(init_text=None):
     confirm_template_message = TemplateSendMessage(
         alt_text='Please check message on your smartphone',
         template=ConfirmTemplate(
-            text='Do you want to know which celebrity you look like?',
+            text=init_text + 'Do you want to know which celebrity you look like?',
             actions=[
                 PostbackTemplateAction(
                     label='Yes!',
@@ -244,14 +244,12 @@ def computeScore(json_score):
 
 # analyze postback action
 def analyzePostbackEvent(event):
-    app.logger.info('postback action: ' + str(event.postback.data))
+    app.logger.info('postback action: ' + str(event) + ' ' + event.user.display_name)
     if str(event.postback.data) == 'action=tryme':
-        app.logger.info('user id: ' + event.user.user_id)
-        text_message = TextSendMessage(text='That\'s great ' + event.user.user_id + '! Please send me a picture of yourself.')
-    elif str(event.postback.data) == 'action=agree':
-        app.logger.info('user id: ' + event.user.user_id)
-        text_message = TextSendMessage(text='That\'s great ' + event.user.user_id + '! Please send me a picture of yourself.')
-    return text_message
+        sendMessage = TextSendMessage(text='That\'s great ' + event.user.user_id + '! Please send me a picture of yourself.')
+    elif 'action=agree' in str(event.postback.data):
+        sendMessage = createConfirmMessage('Thank you ' + event.user.display_name)
+    return sendMessage
 
 # query stackoverflow
 def queryStackOverflow(query):
