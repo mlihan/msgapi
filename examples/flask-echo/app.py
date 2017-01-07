@@ -204,7 +204,26 @@ def createMessageTemplate(user, classifiers):
     
     carousel_template_message = TemplateSendMessage(
         alt_text='test', #user + ' has is a celebrity look alike! Please check your smartphone',
-        template=CarouselTemplate(columns=columns)
+        template=CarouselTemplate(columns=[CarouselColumn(
+            thumbnail_image_url=celeb['image_url'],
+            title=title[:39],
+            text='Score: ', #+ score + '%',
+            actions=[
+                PostbackTemplateAction(
+                    label='Agree',
+                    text= 'I agree that ', # + user + ' looks like ' + celeb['local_name'],
+                    data='action=agree&text='# + str(index)
+                ),
+                MessageTemplateAction(
+                    label='Disagree',
+                    text='I think ' #+ user + ' is ' + compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
+                ),
+                URITemplateAction(
+                    label='Share',
+                    uri='http://example.com/1'
+                )
+            ]
+        )])
     )
     return carousel_template_message
 
