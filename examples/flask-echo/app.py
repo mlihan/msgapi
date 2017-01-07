@@ -17,10 +17,9 @@ from __future__ import unicode_literals
 import os
 import sys
 import requests, json, configparser 
-import celeb_db
+import celeb_db, compliment
 import image_management 
 
-from compliment import Compliment
 from argparse import ArgumentParser
 from watson_developer_cloud import VisualRecognitionV3
 
@@ -192,7 +191,7 @@ def createMessageTemplate(user, classifiers):
                 ),
                 MessageTemplateAction(
                     label='Disagree',
-                    text='I think ' + user + ' is ' + Compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
+                    text='I think ' + user + ' is ' + compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
                 ),
                 URITemplateAction(
                     label='Share',
@@ -248,7 +247,7 @@ def analyzePostbackEvent(event):
     if str(event.postback.data) == 'action=tryme':
         sendMessage = TextSendMessage(text='That\'s great ' + event.user.user_id + '! Please send me a picture of yourself.')
     elif 'action=agree' in str(event.postback.data):
-        sendMessage = createConfirmMessage('Thank you ' + event.user.display_name)
+        sendMessage = createConfirmMessage('Thank you ' + event.user.display_name + '. ')
     return sendMessage
 
 # query stackoverflow
