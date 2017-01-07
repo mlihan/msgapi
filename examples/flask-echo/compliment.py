@@ -7,4 +7,4 @@ def getRandomCompliment(sex):
 	if sex == 'male':
 		return random.choice(male_compliments)
 	elif sex == 'female':
-		return random.choice(femaale_compliments)
+		return random.choice(female_compliments)
