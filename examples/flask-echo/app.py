@@ -216,7 +216,7 @@ def createMessageTemplate(classifiers, sender_image_id=None):
         columns.append(temp)
 
     carousel_template_message = TemplateSendMessage(
-        alt_text='Your friend has a celebrity look alike! Please check your smartphone',
+        alt_text='Wow! A celebrity look alike! Please check your smartphone',
         template=CarouselTemplate(columns=columns)
     )
     return carousel_template_message
@@ -255,9 +255,9 @@ def createImageMap(data):
 
     app.logger.info('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score)
     url = 'http://res.cloudinary.com/line/image/upload/c_scale,g_faces:center,l_' \
-        '%s,w_256,x_-128/c_scale,g_faces:center,l_' \
-        '%s,w_256,x_128/c_scale,g_south_east,h_70,l_logo_w_name/l_text:Verdana_30_bold:Similarity%0A' \
-        '%s%25,g_south,y_10/v1483810445/template.jpg' % (celeb_img_id, sender_img_id, score)
+        '{0},w_256,x_-128/c_scale,g_faces:center,l_' \
+        '{1},w_256,x_128/c_scale,g_south_east,h_70,l_logo_w_name/l_text:Verdana_30_bold:Similarity%0A' \
+        '{2}%25,g_south,y_10/v1483810445/template.jpg'.format(celeb_img_id, sender_img_id, score)
     imagemap_message = ImagemapSendMessage(
         base_url=url,
         alt_text='Please check your smartphone',
