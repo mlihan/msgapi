@@ -208,9 +208,9 @@ def createMessageTemplate(user, classifiers):
     carousel_template_message = TemplateSendMessage(
         alt_text='test', #user + ' has is a celebrity look alike! Please check your smartphone',
         template=CarouselTemplate(columns=[CarouselColumn(
-                thumbnail_image_url=celeb['image_url'],
+                thumbnail_image_url='https://example.com/item1.jpg', #celeb['image_url'],
                 title=title[:39],
-                text='Score: ' + score + '%',
+                text='Score: ',# + score + '%',
                 actions=[
                     PostbackTemplateAction(
                         label='Agree',
