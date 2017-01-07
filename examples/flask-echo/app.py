@@ -178,7 +178,7 @@ def createMessageTemplate(user, classifiers):
         app.logger.info(str(celeb))
         score = computeScore(celeb_class['score'])
         app.logger.info('Carousel index:' + str(index) + ' for ' + str(celeb['en_name']) + ' score: ' + str(score))
-        title = user + ' looks like ' + celeb['local_name'] + '(' + celeb['en_name'] + ')'
+        title = user + ' looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
         app.logger.info(celeb['image_url'] + title[:39] + ' ' + celeb['local_name'] + compliment.getRandomCompliment(celeb['sex']))
         temp = CarouselColumn(
             thumbnail_image_url=celeb['image_url'],
@@ -187,12 +187,12 @@ def createMessageTemplate(user, classifiers):
             actions=[
                 PostbackTemplateAction(
                     label='Agree',
-                    text= 'I agree that '+ user + ' looks like ' + celeb['local_name'],
+                    text= 'I agree that ',# + user + ' looks like ' + celeb['local_name'],
                     data='action=agree&text=' + str(index)
                 ),
                 MessageTemplateAction(
                     label='Disagree',
-                    text='I think ' + user + ' is ' + compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
+                    text='I think ' #+ user + ' is ' + compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
                 ),
                 URITemplateAction(
                     label='Share',
