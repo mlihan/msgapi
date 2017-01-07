@@ -201,7 +201,8 @@ def createMessageTemplate(user, classifiers):
             ]
         )
         columns.append(temp)
-    celeb = classifiers[0]['classes'][0]
+    celeb_class = classifiers[0]['classes'][0]
+    celeb = celeb_db.findRecordWithId(celeb_class['class'])
     index = 0
     carousel_template_message = TemplateSendMessage(
         alt_text='test', #user + ' has is a celebrity look alike! Please check your smartphone',
