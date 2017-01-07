@@ -259,32 +259,32 @@ def createImageMap(data):
 
     app.logger.info('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score + ' url:' + url)
     
-#    template = ImageSendMessage(
-#                original_content_url=url,
-#                preview_image_url=url
-#                )
-#    return template
+    template = ImageSendMessage(
+                original_content_url=url,
+                preview_image_url=url
+                )
+    return template
 
-    imagemap_message = ImagemapSendMessage(
-        base_url=url,
-        alt_text='Please check your smartphone',
-        base_size=BaseSize(height=1040, width=1040),
-        actions=[
-            URIImagemapAction(
-                link_uri='https://example.com/',
-                area=ImagemapArea(
-                    x=0, y=0, width=520, height=1040
-                )
-            ),
-            MessageImagemapAction(
-                text='hello',
-                area=ImagemapArea(
-                    x=520, y=0, width=520, height=1040
-                )
-            )
-        ]
-    )
-    return imagemap_message
+#    imagemap_message = ImagemapSendMessage(
+#        base_url=url,
+#        alt_text='Please check your smartphone',
+#        base_size=BaseSize(height=1040, width=1040),
+#        actions=[
+#            URIImagemapAction(
+#                link_uri='https://example.com/',
+#                area=ImagemapArea(
+#                    x=0, y=0, width=520, height=1040
+#                )
+#            ),
+#            MessageImagemapAction(
+#                text='hello',
+#                area=ImagemapArea(
+#                    x=520, y=0, width=520, height=1040
+#                )
+#            )
+#        ]
+#    )
+#    return imagemap_message
 
 # compute look alike score of a celebrity
 def computeScore(json_score):
