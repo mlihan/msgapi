@@ -254,10 +254,10 @@ def createImageMap(data):
     score = data.split('&')[3].split('=')[1]
 
     app.logger.info('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score)
-    url = 'http://res.cloudinary.com/line/image/upload/c_scale,g_faces:center,l_' +
-        celeb_img_id + ',w_256,x_-128/c_scale,g_faces:center,l_' +
-        sender_img_id + ',w_256,x_128/c_scale,g_south_east,h_70,l_logo_w_name/l_text:Verdana_30_bold:Similarity%0A' +
-        score + '%25,g_south,y_10/v1483810445/template.jpg'
+    url = 'http://res.cloudinary.com/line/image/upload/c_scale,g_faces:center,l_' \
+        '%s,w_256,x_-128/c_scale,g_faces:center,l_' \
+        '%s,w_256,x_128/c_scale,g_south_east,h_70,l_logo_w_name/l_text:Verdana_30_bold:Similarity%0A' \
+        '%s%25,g_south,y_10/v1483810445/template.jpg' % (celeb_img_id, sender_img_id, score)
     imagemap_message = ImagemapSendMessage(
         base_url=url,
         alt_text='Please check your smartphone',
