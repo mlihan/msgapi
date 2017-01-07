@@ -252,27 +252,27 @@ def createImageMap(data):
     celeb_img_id = data.split('&')[1].split('=')[1]
     sender_img_id = data.split('&')[2].split('=')[1]
     score = data.split('&')[3].split('=')[1]
-
-    app.logger.info('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score)
     url = 'http://res.cloudinary.com/line/image/upload/c_scale,g_faces:center,l_' \
         '{0},w_256,x_-128/c_scale,g_faces:center,l_' \
         '{1},w_256,x_128/c_scale,g_south_east,h_70,l_logo_w_name/l_text:Verdana_30_bold:Similarity%0A' \
         '{2}%25,g_south,y_10/v1483810445/template.jpg'.format(celeb_img_id, sender_img_id, score)
+
+    app.logger.info('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score + ' url:' + url)
     imagemap_message = ImagemapSendMessage(
         base_url=url,
         alt_text='Please check your smartphone',
-        base_size=BaseSize(height=520, width=520),
+        base_size=BaseSize(height=1040, width=1040),
         actions=[
             URIImagemapAction(
                 link_uri='https://example.com/',
                 area=ImagemapArea(
-                    x=0, y=0, width=260, height=520
+                    x=0, y=0, width=520, height=1040
                 )
             ),
             MessageImagemapAction(
                 text='hello',
                 area=ImagemapArea(
-                    x=260, y=0, width=260, height=520
+                    x=520, y=0, width=520, height=1040
                 )
             )
         ]
