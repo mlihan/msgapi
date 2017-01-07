@@ -181,21 +181,21 @@ def createMessageTemplate(user, classifiers):
         title = user + ' looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
         app.logger.info(celeb['image_url'] + title[:39] + ' ' + celeb['local_name'] + compliment.getRandomCompliment(celeb['sex']))
         temp = CarouselColumn(
-            thumbnail_image_url=celeb['image_url'],
-            title=title[:39],
-            text='Score: ', #+ score + '%',
+            thumbnail_image_url='https://example.com/item1.jpg',
+            title='this is menu1',
+            text='description1',
             actions=[
                 PostbackTemplateAction(
-                    label='Agree',
-                    text= 'I agree that ', # + user + ' looks like ' + celeb['local_name'],
-                    data='action=agree&text=' + str(index)
+                    label='postback1',
+                    text='postback text1',
+                    data='action=buy&itemid=1'
                 ),
                 MessageTemplateAction(
-                    label='Disagree',
-                    text='I think ' #+ user + ' is ' + compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
+                    label='message1',
+                    text='message text1'
                 ),
                 URITemplateAction(
-                    label='Share',
+                    label='uri1',
                     uri='http://example.com/1'
                 )
             ]
@@ -203,7 +203,7 @@ def createMessageTemplate(user, classifiers):
         columns.append(temp)
     
     carousel_template_message = TemplateSendMessage(
-        alt_text='test', #user + ' has is a celebrity look alike! Please check your smartphone',
+        alt_text=user + ' has is a celebrity look alike! Please check your smartphone',
         template=CarouselTemplate(columns=[CarouselColumn(
                 thumbnail_image_url='https://example.com/item1.jpg',
                 title='this is menu1',
