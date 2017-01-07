@@ -115,8 +115,8 @@ def callback():
             # 3 a celebrity lookalike but not a person
             elif isCelebrity:
                 type_class = classifiers[0]['classes'][1]['class']
-                celebs = celeb_db.findRecordWithId(classifiers[0]['classes'][0]['class'])
-                sendMessage = TextSendMessage(text='Funny, that looks like my friend ' + celeb_name + ' but is a ' + type_class)
+                celeb = celeb_db.findRecordWithId(classifiers[0]['classes'][0]['class'])
+                sendMessage = TextSendMessage(text='Funny, that looks like my friend ' + celeb['local_name'] + ' but that is a ' + type_class)
             # TODO: 4 a person, call detect_face send a single template message, 
             elif isPerson:
                 type_class = classifiers[0]['classes'][0]['class']
@@ -240,8 +240,7 @@ def computeScore(json_score):
     score = (json_score * 100) + magic_num
     if score >= 100:
         score = 99
-    round(score, 2)
-    return score
+    return str(round(score, 2))
 
 # analyze postback action
 def analyzePostbackEvent(event):
