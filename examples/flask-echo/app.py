@@ -289,7 +289,7 @@ def analyzePostbackEvent(event):
     elif 'action=agree' in data:
         sendMessage = []
         sendMessage.append(createConfirmMessage())
-        sendMessage.append(createImageMap(data)
+        sendMessage.append(createImageMap(data))
     return sendMessage
 
 if __name__ == "__main__":
