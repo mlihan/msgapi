@@ -177,7 +177,7 @@ def createMessageTemplate(user, classifiers):
     for index, celeb_class in enumerate(classifiers[0]['classes']):
         celeb = celeb_db.findRecordWithId(celeb_class['class'])
         score = computeScore(celeb_class['score'])
-        app.logger.info('Carousel index:' + index + ' for ' + celeb['en_name'] + ' score: ' + score)
+        app.logger.info('Carousel index:' + str(index) + ' for ' + celeb['en_name'] + ' score: ' + str(score))
         title = user + ' looks like ' + celeb['local_name'] + '(' + celeb['en_name'] + ')'
         temp = CarouselColumn(
             thumbnail_image_url=celeb['image_url'],
@@ -253,6 +253,7 @@ def analyzePostbackEvent(event):
         text_message = TextSendMessage(text='That\'s great ' + event.user.user_id + '! Please send me a picture of yourself.')
     return text_message
 
+# query stackoverflow
 def queryStackOverflow(query):
     query = query[3:]
     url = 'https://api.stackexchange.com/2.2/search/advanced?'
