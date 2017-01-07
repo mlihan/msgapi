@@ -104,7 +104,8 @@ def callback():
                 return 'OK'
 
             isCelebrity = len(classifiers) > 1
-            isPerson = 'person' in json.dumps(classifiers)
+            celeb_confidence = classifiers[0]['classes'][0]['score']
+            isPerson = 'person' in json.dumps(classifiers) and celeb_confidence < 0.6
             
             app.logger.info('isCelebrity: ' + str(isCelebrity) + ' isPerson:' + str(isPerson))
 
@@ -113,7 +114,7 @@ def callback():
                 sendMessage = createMessageTemplate('marc', classifiers)
             # 3 a celebrity lookalike but not a person
             elif isCelebrity:
-                type_class = classifiers[0]['classes'][1]['class']
+                type_class = classifiers[1]['classes'][0]['class']
                 celeb = celeb_db.findRecordWithId(classifiers[0]['classes'][0]['class'])
                 sendMessage = TextSendMessage(text='Funny, that looks like my friend ' + celeb['local_name'] + ' but that is a ' + type_class)
             # TODO: 4 a person, call detect_face send a single template message, 
