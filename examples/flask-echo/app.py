@@ -203,7 +203,7 @@ def createMessageTemplate(user, classifiers):
         columns.append(temp)
     
     carousel_template_message = TemplateSendMessage(
-        alt_text=user + ' has is a celebrity look alike! Please check your smartphone',
+        alt_text='test', #user + ' has is a celebrity look alike! Please check your smartphone',
         template=CarouselTemplate(columns=columns)
     )
     return carousel_template_message
