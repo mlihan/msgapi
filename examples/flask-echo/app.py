@@ -17,9 +17,10 @@ from __future__ import unicode_literals
 import os
 import sys
 import requests, json, configparser 
-import mongo_db
+import celeb_db
 import image_management 
 
+from compliment import Compliment
 from argparse import ArgumentParser
 from watson_developer_cloud import VisualRecognitionV3
 
@@ -107,15 +108,22 @@ def callback():
             isPerson = 'person' in json.dumps(classifiers)
             
             app.logger.info('isCelebrity: ' + str(isCelebrity) + ' isPerson:' + str(isPerson))
-            # 2 a celebrity look alike, send a template message carousel
-            if isCelebrity:
+
+            # 2 a person and celebrity look alike, send a template message carousel
+            if isCelebrity and isPerson:
                 sendMessage = createMessageTemplate(classifiers)
-            # TODO: 3 a person, call detect_face send a single template message, 
+            # 3 a celebrity lookalike but not a person
+            elif isCelebrity:
+                type_class = classifiers[0]['classes'][1]['class']
+                celeb_name = celeb_db.findRecordWithId(classifiers[0]['classes'][0]['class'])
+                sendMessage = TextSendMessage(text='Funny, that looks like my friend ' + celeb_name + ' but is a ' + type_class)
+            # TODO: 4 a person, call detect_face send a single template message, 
             elif isPerson:
-                sendMessage = TextSendMessage(text='You don\'t look like any celebrities')
+                type_class = classifiers[0]['classes'][0]['class']
+                sendMessage = TextSendMessage(text='You don\'t look like any celebrities, but you look like a ' + type_class)
                 #call v3/classify with 
                 #call v3/detect_face
-            # 4 others. send a text message
+            # 5 others. send a text message
             else:
                 type_class = classifiers[0]['classes'][0]['class']
                 app.logger.info('not human but a type_class: ' + type_class)
@@ -123,22 +131,6 @@ def callback():
                 sendMessage = TextSendMessage(text=text)
         else:
             continue
-
-        # For stackoverflow
-        #if not isinstance(event, MessageEvent):
-        #    continue
-        #if not isinstance(event.message, TextMessage):
-        #    continue
-        #text_message = event.message.text
-        # if prefix is @so, check StackOverflow
-        #if text_message.lower().startswith('@so'):
-        #    sendMessage = queryStackOverflow(text_message)            
-        # if prefix is @go, check 
-        #elif text_message.lower().startswith('@go'):
-        #    # do nothing first
-        #    sendMessage = None 
-        #else:
-        #    continue
 
         line_bot_api.reply_message(event.reply_token, sendMessage)
 
@@ -179,54 +171,37 @@ def classifyImageMessage(image_url):
     else:
         return 0
 
-def createMessageTemplate(data):
-
-    carousel_template_message = TemplateSendMessage(
-        alt_text='Carousel template',
-        template=CarouselTemplate(
-            columns=[
-                CarouselColumn(
-                    thumbnail_image_url='https://example.com/item1.jpg',
-                    title='this is menu1',
-                    text='description1',
-                    actions=[
-                        PostbackTemplateAction(
-                            label='postback1',
-                            text='postback text1',
-                            data='action=buy&itemid=1'
-                        ),
-                        MessageTemplateAction(
-                            label='message1',
-                            text='message text1'
-                        ),
-                        URITemplateAction(
-                            label='uri1',
-                            uri='http://example.com/1'
-                        )
-                    ]
+def createMessageTemplate(classifiers):
+    columns = []
+    for index, celeb_class in enumerate(classifiers[0]['classes']):
+        celeb = celeb_db.findRecordWithId(celeb_class['class'])
+        score = computeScore(celeb_class['score'])
+        app.logger.info('Carousel index:' + index + ' for ' + celeb['en_name'] + ' score: ' + score)
+        temp = CarouselColumn(
+            thumbnail_image_url=celeb['image_url'],
+            title=celeb['local_name'] + '(' + celeb['en_name'] + ')',
+            text='Score: ' + score + '%',
+            actions=[
+                PostbackTemplateAction(
+                    label='Agree',
+                    text='postback text1',
+                    data='action=buy&itemid=1'
                 ),
-                CarouselColumn(
-                    thumbnail_image_url='https://example.com/item2.jpg',
-                    title='this is menu2',
-                    text='description2',
-                    actions=[
-                        PostbackTemplateAction(
-                            label='postback2',
-                            text='postback text2',
-                            data='action=buy&itemid=2'
-                        ),
-                        MessageTemplateAction(
-                            label='message2',
-                            text='message text2'
-                        ),
-                        URITemplateAction(
-                            label='uri2',
-                            uri='http://example.com/2'
-                        )
-                    ]
+                MessageTemplateAction(
+                    label='Disagree',
+                    text='I think ' + 'userid' + ' is ' + Compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
+                ),
+                URITemplateAction(
+                    label='Share',
+                    uri='http://example.com/1'
                 )
             ]
         )
+        columns.append(temp)
+    
+    carousel_template_message = TemplateSendMessage(
+        alt_text='Your friend is a celebrity look alike! Please check your smartphone',
+        template=CarouselTemplate(columns=columns)
     )
     return carousel_template_message
 

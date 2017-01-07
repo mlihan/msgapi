@@ -10,7 +10,7 @@ celeb_collection = client.heroku_lsms3n9l.celebs
 def addRecord(celeb_id, en_name, sex, country, image_url, local_name=None, zh_name=None,  age=None, message_id=None):
     record = {
     	'celeb_id':celeb_id,
-    	'name_id':name_id,
+    	'en_name':en_name,
     	'local_name':local_name, 
     	'zh_name':zh_name, 
     	'sex':sex,
@@ -22,7 +22,7 @@ def addRecord(celeb_id, en_name, sex, country, image_url, local_name=None, zh_na
     celeb_collection.insert_one(record)
 
 def findRecordWithId(celeb_id):
-    return image_collection.find({'celeb_id':celeb_id})
+    return celeb_collection.find_one({'celeb_id':celeb_id})
 
-def findImageWithName(en_name):
-    return image_collection.find({'en_name': name})
+def findRecordWithName(en_name):
+    return celeb_collection.find({'en_name': name})
