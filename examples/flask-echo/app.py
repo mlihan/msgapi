@@ -171,6 +171,7 @@ def classifyImageMessage(image_url):
     else:
         return 0
 
+# Create a carouse message template if user looks like a celebrity
 def createMessageTemplate(user, classifiers):
     columns = []
     for index, celeb_class in enumerate(classifiers[0]['classes']):
@@ -185,12 +186,12 @@ def createMessageTemplate(user, classifiers):
             actions=[
                 PostbackTemplateAction(
                     label='Agree',
-                    text='postback text1',
-                    data='action=buy&itemid=1'
+                    text= user + ' looks like ' + celeb['local_name'],
+                    data='action=agree&text=' + index
                 ),
                 MessageTemplateAction(
                     label='Disagree',
-                    text='I think ' + 'userid' + ' is ' + Compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
+                    text='I think ' + user + ' is ' + Compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
                 ),
                 URITemplateAction(
                     label='Share',
@@ -206,33 +207,48 @@ def createMessageTemplate(user, classifiers):
     )
     return carousel_template_message
 
+# create a welcome message
 def createWelcomeMessage(): 
     text_message = TextSendMessage(text=config.get(language, 'Welcome_Message'))
     return text_message
 
+# create a confirm message
 def createConfirmMessage():
     confirm_template_message = TemplateSendMessage(
         alt_text='Please check message on your smartphone',
         template=ConfirmTemplate(
-            text='Do you want to know who you look like?',
+            text='Do you want to know which celebrity you look like?',
             actions=[
                 PostbackTemplateAction(
                     label='Yes!',
-                    text='Yes!',
-                    data='action=y'
+                    text='Yes! Who do I look like?',
+                    data='action=tryme'
                 ),
                 MessageTemplateAction(
                     label='About Me',
-                    text='I\'m a bot that searches for a celebrities who look like you. Try me!'
+                    text='I\'m a bot that searches for a celebrities who look like you. Try and send me a picture!'
                 )
             ]
         )
     )
     return confirm_template_message
 
+# compute look alike score of a celebrity
+def computeScore(json_score):
+    magic_num = 10
+    score = (json_score * 100) + magic_num
+    if score >= 100:
+        score = 99
+    round(score, 2)
+    return score
+
+# analyze postback action
 def analyzePostbackEvent(event):
     app.logger.info('postback action: ' + str(event.postback.data))
-    if str(event.postback.data) == 'action=y':
+    if str(event.postback.data) == 'action=tryme':
+        app.logger.info('user id: ' + event.user.user_id)
+        text_message = TextSendMessage(text='That\'s great ' + event.user.user_id + '! Please send me a picture of yourself.')
+    elif str(event.postback.data) == 'action=agree':
         app.logger.info('user id: ' + event.user.user_id)
         text_message = TextSendMessage(text='That\'s great ' + event.user.user_id + '! Please send me a picture of yourself.')
     return text_message
