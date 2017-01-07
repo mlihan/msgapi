@@ -171,15 +171,16 @@ def classifyImageMessage(image_url):
     else:
         return 0
 
-def createMessageTemplate(classifiers):
+def createMessageTemplate(user, classifiers):
     columns = []
     for index, celeb_class in enumerate(classifiers[0]['classes']):
         celeb = celeb_db.findRecordWithId(celeb_class['class'])
         score = computeScore(celeb_class['score'])
         app.logger.info('Carousel index:' + index + ' for ' + celeb['en_name'] + ' score: ' + score)
+        title = user + ' looks like ' + celeb['local_name'] + '(' + celeb['en_name'] + ')'
         temp = CarouselColumn(
             thumbnail_image_url=celeb['image_url'],
-            title=celeb['local_name'] + '(' + celeb['en_name'] + ')',
+            title=title[:40],
             text='Score: ' + score + '%',
             actions=[
                 PostbackTemplateAction(
@@ -200,7 +201,7 @@ def createMessageTemplate(classifiers):
         columns.append(temp)
     
     carousel_template_message = TemplateSendMessage(
-        alt_text='Your friend is a celebrity look alike! Please check your smartphone',
+        alt_text= user + ' has is a celebrity look alike! Please check your smartphone',
         template=CarouselTemplate(columns=columns)
     )
     return carousel_template_message
