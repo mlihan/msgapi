@@ -100,7 +100,7 @@ def callback():
             app.logger.info('event MessageEvent(Image): ' + str(event) )
 
             # If user sends an image, save content
-            image_url = saveContentImage(event)
+            image_url, sender_image_id = saveContentImage(event)
             # classify the image 
             classifiers = classifyImageMessage(image_url)
 
@@ -120,7 +120,7 @@ def callback():
 
             # 2 a person and celebrity look alike, send a template message carousel
             if isCelebrity and isPerson:
-                sendMessage = createMessageTemplate(classifiers)
+                sendMessage = createMessageTemplate(classifiers, sender_image_id)
             # 3 a celebrity lookalike but not a person
             elif isCelebrity:
                 type_class = classifiers[1]['classes'][0]['class']
@@ -156,7 +156,7 @@ def saveContentImage(event):
         fp.write(image_binary)
         fp.close()
         image_url, image_id = image_management.upload(event.message.id, 'temp_img')
-        return image_url
+        return image_url, image_id
     except:
         app.logger.error("Unexpected error:" + sys.exc_info()[0])
         return 'NG'
@@ -180,15 +180,15 @@ def classifyImageMessage(image_url):
     else:
         return 0
 
-# Create a carouse message template if user looks like a celebrity
-def createMessageTemplate(classifiers):
+# Create a carouse; message template if user looks like a celebrity
+def createMessageTemplate(classifiers, sender_image_id=None):
     columns = []
     for index, celeb_class in enumerate(classifiers[0]['classes']):
         celeb = celeb_db.findRecordWithId(celeb_class['class'])
         score = computeScore(celeb_class['score'])
         app.logger.info('Carousel index:' + str(index) + ' for ' + str(celeb['en_name']) + ' score: ' + str(score))
         gender = 'she'
-        if celeb['sex'] == 'male'
+        if celeb['sex'] == 'male':
             gender = 'he'
 
         title = gender + ' looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
@@ -201,7 +201,7 @@ def createMessageTemplate(classifiers):
                 PostbackTemplateAction(
                     label='Agree',
                     text= 'I agree that ' + gender +' looks like ' + celeb['local_name'],
-                    data='action=agree&text=' + str(index)
+                    data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id)
                 ),
                 MessageTemplateAction(
                     label='Disagree',
@@ -247,6 +247,32 @@ def createConfirmMessage(init_text=None):
     )
     return confirm_template_message
 
+# create a image map message
+def createImageMap(data):
+    celeb_img_id = data.split('&')[1].split('=')[1]
+    sender_img_id = data.split('&')[2].split('=')[1]
+    app.logger.info('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id )
+    imagemap_message = ImagemapSendMessage(
+        base_url='https://example.com/base',
+        alt_text='this is an imagemap',
+        base_size=BaseSize(height=1040, width=1040),
+        actions=[
+            URIImagemapAction(
+                link_uri='https://example.com/',
+                area=ImagemapArea(
+                    x=0, y=0, width=520, height=1040
+                )
+            ),
+            MessageImagemapAction(
+                text='hello',
+                area=ImagemapArea(
+                    x=520, y=0, width=520, height=1040
+                )
+            )
+        ]
+    )
+    return imagemap_message
+
 # compute look alike score of a celebrity
 def computeScore(json_score):
     magic_num = 10
@@ -257,10 +283,13 @@ def computeScore(json_score):
 
 # analyze postback action
 def analyzePostbackEvent(event):
-    if str(event.postback.data) == 'action=tryme':
-        sendMessage = TextSendMessage(text='That\'s great ' + event.user.user_id + '! Please send me a picture of yourself.')
-    elif 'action=agree' in str(event.postback.data):
-        sendMessage = createConfirmMessage('Thank you ' + event.source.userId + '. ')
+    data = str(event.postback.data)
+    if data == 'action=tryme':
+        sendMessage = TextSendMessage(text='Please send me a picture of yourself.')
+    elif 'action=agree' in data:
+        sendMessage = []
+        sendMessage.append(createConfirmMessage())
+        sendMessage.append(createImageMap(data)
     return sendMessage
 
 if __name__ == "__main__":
