@@ -120,7 +120,7 @@ def callback():
 
             # 2 a person and celebrity look alike, send a template message carousel
             if isCelebrity and isPerson:
-                sendMessage = createMessageTemplate('marc', classifiers)
+                sendMessage = createMessageTemplate(classifiers)
             # 3 a celebrity lookalike but not a person
             elif isCelebrity:
                 type_class = classifiers[1]['classes'][0]['class']
@@ -130,7 +130,6 @@ def callback():
             elif isPerson:
                 type_class = classifiers[0]['classes'][0]['class']
                 sendMessage = TextSendMessage(text='You don\'t look like any celebrities, but you look like a ' + type_class)
-                #call v3/classify with 
                 #call v3/detect_face
             # 5 others. send a text message
             else:
@@ -182,13 +181,17 @@ def classifyImageMessage(image_url):
         return 0
 
 # Create a carouse message template if user looks like a celebrity
-def createMessageTemplate(user, classifiers):
+def createMessageTemplate(classifiers):
     columns = []
     for index, celeb_class in enumerate(classifiers[0]['classes']):
         celeb = celeb_db.findRecordWithId(celeb_class['class'])
         score = computeScore(celeb_class['score'])
         app.logger.info('Carousel index:' + str(index) + ' for ' + str(celeb['en_name']) + ' score: ' + str(score))
-        title = user + ' looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
+        gender = 'she'
+        if celeb['sex'] == 'male'
+            gender = 'he'
+
+        title = gender + ' looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
 
         temp = CarouselColumn(
             thumbnail_image_url=celeb['image_url'],
@@ -197,12 +200,12 @@ def createMessageTemplate(user, classifiers):
             actions=[
                 PostbackTemplateAction(
                     label='Agree',
-                    text= 'I agree that ' + user + ' looks like ' + celeb['local_name'],
+                    text= 'I agree that he/she looks like ' + celeb['local_name'],
                     data='action=agree&text=' + str(index)
                 ),
                 MessageTemplateAction(
                     label='Disagree',
-                    text='I think ' + user + ' is ' + compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
+                    text='I think ' + gender + ' is ' + compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
                 ),
                 URITemplateAction(
                     label='Share to friends',
@@ -213,7 +216,7 @@ def createMessageTemplate(user, classifiers):
         columns.append(temp)
 
     carousel_template_message = TemplateSendMessage(
-        alt_text=user + ' has is a celebrity look alike! Please check your smartphone',
+        alt_text='Your friend has a celebrity look alike! Please check your smartphone',
         template=CarouselTemplate(columns=columns)
     )
     return carousel_template_message
