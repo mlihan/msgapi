@@ -200,7 +200,7 @@ def createMessageTemplate(classifiers):
             actions=[
                 PostbackTemplateAction(
                     label='Agree',
-                    text= 'I agree that he/she looks like ' + celeb['local_name'],
+                    text= 'I agree that ' + gender +' looks like ' + celeb['local_name'],
                     data='action=agree&text=' + str(index)
                 ),
                 MessageTemplateAction(
