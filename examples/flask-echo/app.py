@@ -176,8 +176,9 @@ def createMessageTemplate(user, classifiers):
     columns = []
     for index, celeb_class in enumerate(classifiers[0]['classes']):
         celeb = celeb_db.findRecordWithId(celeb_class['class'])
+        app.logger.info(str(celeb))
         score = computeScore(celeb_class['score'])
-        app.logger.info('Carousel index:' + str(index) + ' for ' + celeb['en_name'] + ' score: ' + str(score))
+        app.logger.info('Carousel index:' + str(index) + ' for ' + str(celeb['en_name']) + ' score: ' + str(score))
         title = user + ' looks like ' + celeb['local_name'] + '(' + celeb['en_name'] + ')'
         temp = CarouselColumn(
             thumbnail_image_url=celeb['image_url'],
