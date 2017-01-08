@@ -23,6 +23,7 @@ import image_management
 from argparse import ArgumentParser
 from watson_developer_cloud import VisualRecognitionV3
 
+from random import randint
 from flask import Flask, request, abort
 from linebot import (
     LineBotApi, WebhookParser
