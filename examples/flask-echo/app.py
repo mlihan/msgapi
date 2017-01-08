@@ -148,7 +148,7 @@ def analyzePostbackEvent(event):
         app.logger.info('[EVENTLOG] Postback agree Event: {0}'.format(data) )
         sendMessage = []
         sendMessage.append(createImageMessage(data))
-        if event.postback.source.type == 'group'
+        if event.postback.source.type == 'group':
             sendMessage.append(createConfirmMessage())
 
     return sendMessage
