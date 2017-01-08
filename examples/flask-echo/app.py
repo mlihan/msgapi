@@ -265,10 +265,11 @@ def createImageMesssage(data):
     sender_img_id = data.split('&')[2].split('=')[1]
     score = data.split('&')[3].split('=')[1]
     url = 'https://res.cloudinary.com/' \
-        '{0}/image/upload/c_scale,g_faces:center,l_' \
-        '{1},w_256,h_400,x_-128/c_fill,g_faces:center,l_' \
-        '{2},w_256,h_400,x_128/c_fill,g_south_east,h_70,l_logo_w_name/l_text:Verdana_30_bold:Similarity%0A' \
-        '{3}%25,g_south,y_10/v1483810445/template.jpg'.format(cloudinary_cloud, celeb_img_id, sender_img_id, score)
+        '{0}/image/upload/c_fill,g_face:center,l_' \
+        '{1},w_225,h_400,x_-128/c_fill,g_face:center,l_' \
+        '{2},w_256,h_400,x_128/c_scale,g_south,h_100,l_logo_w_name/l_text:Verdana_35_bold:Similarity%20' \
+        '{3}%25,co_rgb:990C47,y_155,g_north,y_10/template.jpg' \
+        .format(cloudinary_cloud, celeb_img_id, sender_img_id, score)
 
     app.logger.info('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score + ' url:' + url)    
     template = ImageSendMessage(
