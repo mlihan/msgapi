@@ -127,7 +127,6 @@ def callback():
 def analyzePostbackEvent(event):
     data = str(event.postback.data)
     if 'action=tryme' in data:
-        app.logger.info('[EVENTLOG] Postback tryme Event: {0}'.format(data) )
         sendMessage = None
         if 'user_id' in data:
             # Use profile picture of user to classify
@@ -145,10 +144,9 @@ def analyzePostbackEvent(event):
             sendMessage = TextSendMessage(text='Please send me a picture of yourself.')
 
     elif 'action=agree' in data:
-        app.logger.info('[EVENTLOG] Postback agree Event: {0}'.format(data) )
         sendMessage = []
         sendMessage.append(createImageMessage(data))
-        if event.postback.source.type == 'group':
+        if event.source.type == 'group':
             sendMessage.append(createConfirmMessage())
 
     return sendMessage
