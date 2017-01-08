@@ -47,6 +47,7 @@ channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
 bluemix_api_key = os.getenv('BLUEMIX_API_KEY', None)
 oa_id = os.getenv('OA_ID', None)
 bluemix_classifier = os.getenv('BLUEMIX_CLASSIFIER', None)
+cloudinary_cloud = os.getenv('CLOUDINARY_CLOUD', None)
 
 if channel_secret is None:
     print('Specify LINE_CHANNEL_SECRET as environment variable.')
@@ -56,6 +57,15 @@ if channel_access_token is None:
     sys.exit(1)
 if bluemix_api_key is None:
     print('Specify BLUEMIX_API_KEY as environment variable.')
+    sys.exit(1)
+if oa_id is None:
+    print('Specify OA_ID as environment variable')
+    sys.exit(1)
+if bluemix_classifier is None:
+    print('Specify BLUEMIX_CLASSIFIER as environment variable')
+    sys.exit(1)
+if bluemix_classifier is None:
+    print('Specify CLOUDINARY_CLOUD as environment variable')
     sys.exit(1)
 
 visual_recognition = VisualRecognitionV3('2016-05-20', api_key=bluemix_api_key)
@@ -252,40 +262,41 @@ def createImageMap(data):
     celeb_img_id = data.split('&')[1].split('=')[1]
     sender_img_id = data.split('&')[2].split('=')[1]
     score = data.split('&')[3].split('=')[1]
-    url = 'https://res.cloudinary.com/line/image/upload/c_scale,g_faces:center,l_' \
-        '{0},w_256,x_-128/c_scale,g_faces:center,l_' \
-        '{1},w_256,x_128/c_scale,g_south_east,h_70,l_logo_w_name/l_text:Verdana_30_bold:Similarity%0A' \
-        '{2}%25,g_south,y_10/v1483810445/template.jpg'.format(celeb_img_id, sender_img_id, score)
+    url = 'https://res.cloudinary.com/' \
+        '{0}/image/upload/c_scale,g_faces:center,l_' \
+        '{1},w_256,h_400,x_-128/c_fill,g_faces:center,l_' \
+        '{2},w_256,h_400,x_128/c_fill,g_south_east,h_70,l_logo_w_name/l_text:Verdana_30_bold:Similarity%0A' \
+        '{3}%25,g_south,y_10/v1483810445/template.jpg'.format(cloudinary_cloud, celeb_img_id, sender_img_id, score)
 
-#    app.logger.info('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score + ' url:' + url)    
-#    template = ImageSendMessage(
-#                original_content_url=url,
-#                preview_image_url=url
-#                )
-#    return template
-
-    url = 'https://ucarecdn.com/85b5644f-e692-4855-9db0-8c5a83096e25/-/resize'
-    imagemap_message = ImagemapSendMessage(
-       base_url=url,
-       alt_text='Please check your smartphone',
-       base_size=BaseSize(height=1040, width=1040),
-       actions=[
-           URIImagemapAction(
-               link_uri='https://example.com/',
-               area=ImagemapArea(
-                   x=0, y=0, width=520, height=1040
-               )
-           ),
-           MessageImagemapAction(
-               text='hello',
-               area=ImagemapArea(
-                   x=520, y=0, width=520, height=1040
+    app.logger.info('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score + ' url:' + url)    
+    template = ImageSendMessage(
+                original_content_url=url,
+                preview_image_url=url
                 )
-            )
-        ]
-    )
+    return template
 
-    return imagemap_message
+    # url = 'https://ucarecdn.com/85b5644f-e692-4855-9db0-8c5a83096e25/-/resize'
+    # imagemap_message = ImagemapSendMessage(
+    #    base_url=url,
+    #    alt_text='Please check your smartphone',
+    #    base_size=BaseSize(height=1040, width=1040),
+    #    actions=[
+    #        URIImagemapAction(
+    #            link_uri='https://example.com/',
+    #            area=ImagemapArea(
+    #                x=0, y=0, width=520, height=1040
+    #            )
+    #        ),
+    #        MessageImagemapAction(
+    #            text='hello',
+    #            area=ImagemapArea(
+    #                x=520, y=0, width=520, height=1040
+    #             )
+    #         )
+    #     ]
+    # )
+
+    # return imagemap_message
 
 # compute look alike score of a celebrity
 def computeScore(json_score):
