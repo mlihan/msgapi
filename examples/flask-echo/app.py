@@ -230,7 +230,6 @@ def createMessageTemplate(classifiers, sender_image_id=None):
     for index, celeb_class in enumerate(classifiers[0]['classes']):
         celeb = celeb_db.findRecordWithId(celeb_class['class'])
         score = computeScore(celeb_class['score'])
-        print "celeb info:" + str(celeb)
         app.logger.debug('Carousel index: {0} for {1} score:'.format(str(index), str(celeb['en_name'])))
         gender = 'she'
         if celeb['sex'] == 'male':
