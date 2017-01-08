@@ -91,25 +91,22 @@ def callback():
     for event in events:
         # For bluemix
         if isinstance(event, FollowEvent):
-            app.logger.info('event FollowEvent: ' + str(event) )
-
             # If user just added me, send welcome and confirm message
+            app.logger.info('event FollowEvent: ' + str(event) )
             sendMessage = []
-            sendMessage.append(createWelcomeMessage(event.source.user_id))
-            sendMessage.append(createConfirmMessage())
+            sendMessage.append(createWelcomeMessage())
+            sendMessage.append(createConfirmMessage(event.source.user_id))
         elif isinstance(event, JoinEvent):
-            app.logger.info('event JoinEvent: ' + str(event) )
-
             # If user invited me to a group, send confirm message
+            app.logger.info('event JoinEvent: ' + str(event) )
             sendMessage = createConfirmMessage()
         elif isinstance(event, PostbackEvent):
-            app.logger.info('event PostbackEvent: ' + str(event) )
             # For postback events
+            app.logger.info('event PostbackEvent: ' + str(event) )
             sendMessage = analyzePostbackEvent(event)
         elif isinstance(event, MessageEvent) and isinstance(event.message, ImageMessage):
-            app.logger.info('event MessageEvent(Image): ' + str(event) )
-
             # If user sends an image, save content
+            app.logger.info('event MessageEvent(Image): ' + str(event) )
             image_url, sender_image_id = saveContentImage(event)
             # classify the image 
             classifiers = classifyImageMessage(image_url)
@@ -237,7 +234,12 @@ def createWelcomeMessage():
     return text_message
 
 # create a confirm message
-def createConfirmMessage():
+def createConfirmMessage(user_id=None):
+    # if has user id
+    data = 'action=tryme'
+    if user_id is not None:
+        data = data + '&user_id=' + user_id
+
     confirm_template_message = TemplateSendMessage(
         alt_text='Please check message on your smartphone',
         template=ConfirmTemplate(
@@ -246,7 +248,7 @@ def createConfirmMessage():
                 PostbackTemplateAction(
                     label='Yes!',
                     text='Yes! Who do I look like?',
-                    data='action=tryme'
+                    data=data
                 ),
                 MessageTemplateAction(
                     label='About Me',
@@ -258,7 +260,7 @@ def createConfirmMessage():
     return confirm_template_message
 
 # create a image map message
-def createImageMap(data):
+def createImageMesssage(data):
     celeb_img_id = data.split('&')[1].split('=')[1]
     sender_img_id = data.split('&')[2].split('=')[1]
     score = data.split('&')[3].split('=')[1]
@@ -306,15 +308,34 @@ def computeScore(json_score):
         score = 99
     return str(round(score, 2))
 
+# get picture url of a profile
+def getProfilePictureUrl(user_id):
+    try:
+        profile = line_bot_api.get_profile(user_id)
+        app.logger.error('pic url:' + profile.picture_url)
+        return profile.picture_url
+    except:
+        app.logger.error('Unexpected error found: ' + str(e))
+
 # analyze postback action
 def analyzePostbackEvent(event):
     data = str(event.postback.data)
-    if data == 'action=tryme':
-        sendMessage = TextSendMessage(text='Please send me a picture of yourself.')
+    if 'action=tryme' in data:
+        sendMessage = None
+        if 'user_id' in data:
+            # use profile picture of user to classify
+            user_id = data.split('&')[1].split('=')[1]
+            pic_url = getProfilePictureUrl(user_id)
+            classifier = classifyImageMessage(pic_url)
+            sendMessage = createMessageTemplate(classifier)
+        else:
+            sendMessage = TextSendMessage(text='Please send me a picture of yourself.')
+
     elif 'action=agree' in data:
         sendMessage = []
+        sendMessage.append(createImageMessage(data))
         sendMessage.append(createConfirmMessage())
-        sendMessage.append(createImageMap(data))
+
     return sendMessage
 
 if __name__ == "__main__":
