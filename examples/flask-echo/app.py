@@ -326,7 +326,7 @@ def analyzePostbackEvent(event):
             # Use profile picture of user to classify
             user_id = data.split('&')[1].split('=')[1]
             pic_url = getProfilePictureUrl(user_id)
-            classifier = classifyImageMessage(pic_url)
+            classifiers = classifyImageMessage(pic_url)
             # Check if no classifier found, send a text message
             if classifiers == 0:
                 sendMessage = TextSendMessage(text='I\'m sorry but your image is out of this world.')
