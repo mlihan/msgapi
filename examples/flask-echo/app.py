@@ -177,11 +177,15 @@ def classifyImageMessage(image_url):
     threshold = config.get('DEFAULT', 'Bluemix_Threshold')
     
     #call v3/classify
-    response = visual_recognition.classify(
+    try: 
+        response = visual_recognition.classify(
         images_url=image_url,
         classifier_ids=[bluemix_classifier, 'default'], 
         threshold=threshold
         )
+    except:
+        app.logger.error('Unexpected errer' + + sys.exc_info()[0])
+        return 0
     app.logger.debug(json.dumps(response, indent=2))
 
     # check if a classifier is detected in the image
@@ -226,7 +230,8 @@ def createMessageTemplate(classifiers, sender_image_id=None):
     for index, celeb_class in enumerate(classifiers[0]['classes']):
         celeb = celeb_db.findRecordWithId(celeb_class['class'])
         score = computeScore(celeb_class['score'])
-        app.logger.debug('Carousel index: {0} for {1} score: {2}'.format(str(index), str(celeb['en_name']), str(score)))
+        print "celeb info:" + str(celeb)
+        app.logger.debug('Carousel index: {0} for {1} score:'.format(str(index), str(celeb['en_name'])))
         gender = 'she'
         if celeb['sex'] == 'male':
             gender = 'he'
@@ -348,7 +353,7 @@ def getProfilePictureUrl(user_id):
         profile = line_bot_api.get_profile(user_id)
         return profile.picture_url
     except:
-        app.logger.error('Unexpected error found: ' + str(e))
+        app.logger.error('Unexpected error found: ' + + sys.exc_info()[0])
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser(
