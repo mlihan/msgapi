@@ -292,7 +292,7 @@ def createConfirmMessage(user_id=None):
     return confirm_template_message
 
 # create a image map message
-def createImageMesssage(data):
+def createImageMessage(data):
     celeb_img_id = data.split('&')[1].split('=')[1]
     sender_img_id = data.split('&')[2].split('=')[1]
     score = data.split('&')[3].split('=')[1]
