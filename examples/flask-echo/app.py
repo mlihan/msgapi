@@ -183,7 +183,7 @@ def classifyImageMessage(image_url):
     except:
         app.logger.error('Unexpected errer' + + sys.exc_info()[0])
         return 0
-    app.logger.debug(json.dumps(response, indent=2))
+    app.logger.debug(json.dumps(respon  se, indent=2))
 
     # check if a classifier is detected in the image
     if 'classifiers' in json.dumps(response):
@@ -196,9 +196,10 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
     isCelebrity = len(classifiers) > 1
     sorted_list = sorted(classifiers[0]['classes'], key=lambda k:(-float(k['score'])))
     app.logger.debug('sorted: ' + str(sorted_list))
-    isPerson = 'person' in json.dumps(classifiers) or celeb_confidence > 0.98
+    max_confidence = sorted_list[0]['score']
+    isPerson = 'person' in json.dumps(classifiers) or max_confidence > 0.97
     
-    app.logger.debug('isCelebrity: {0} isPerson: {1} celeb_confidence: {2}'.format(str(isCelebrity), str(isPerson), str(celeb_confidence)))
+    app.logger.debug('isCelebrity: {0} isPerson: {1} celeb_confidence: {2}'.format(str(isCelebrity), str(isPerson), str(max_confidence)))
 
     # 1 a person and celebrity look alike, send a template message carousel
     if isCelebrity and isPerson:
