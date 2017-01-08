@@ -133,7 +133,7 @@ def analyzePostbackEvent(event):
             # Use profile picture of user to classify
             user_id = data.split('&')[1].split('=')[1]
             pic_url = getProfilePictureUrl(user_id)
-            image_url, image_id = image_management.upload(pic_url, 'user_profile')
+            image_url, image_id = image_management.upload(pic_url, 'profile_image')
             classifiers = classifyImageMessage(image_url)
 
             # Check if no classifier found, send a text message
@@ -164,7 +164,7 @@ def saveContentImage(event):
         fp = open('temp_img', 'wb') 
         fp.write(image_binary)
         fp.close()
-        image_url, image_id = image_management.upload('temp_img', 'user')
+        image_url, image_id = image_management.upload('temp_img', 'user_image')
         return image_url, image_id
     except:
         app.logger.error('Unexpected error:' + sys.exc_info()[0])
@@ -300,7 +300,7 @@ def createImageMessage(data):
         '{0}/image/upload/c_fill,g_face:center,l_' \
         '{1},w_225,h_400,x_-128/c_fill,g_face:center,l_' \
         '{2},w_256,h_400,x_128/c_scale,g_south,h_100,l_logo_w_name/l_text:Verdana_35_bold:Similarity%20' \
-        '{3}%25,co_rgb:990C47,y_155,g_north,y_10/template.jpg' \
+        '{3}%25,co_rgb:990C47,y_155,g_north,y_10/result.jpg' \
         .format(cloudinary_cloud, celeb_img_id, sender_img_id, score)
 
     app.logger.debug('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score + ' url:' + url)    

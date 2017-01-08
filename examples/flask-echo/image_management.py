@@ -5,7 +5,7 @@ def upload(file_name, tags):
     return response['secure_url'], response['public_id']
 
 def uploadForCelebs(file_name):
-    response = uploader.upload(file_name, use_filename=1, unique_filename=0, tags='celeb_img')
+    response = uploader.upload(file_name, use_filename=1, unique_filename=0, tags='celeb_image')
     return response['secure_url'], response['public_id']
 
 def getPreviewImage(imageId):
