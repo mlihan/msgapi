@@ -111,39 +111,11 @@ def callback():
             # classify the image 
             classifiers = classifyImageMessage(image_url)
 
-            # After classification reply the following to user
-            # 1 no classifier found, send a text message
+            # Check if no classifier found, send a text message
             if classifiers == 0:
-                app.logger.info('no classifier!!')
                 sendMessage = TextSendMessage(text='I\'m sorry but your image is out of this world.')
-                line_bot_api.reply_message(event.reply_token, sendMessage)
-                return 'OK'
-
-            isCelebrity = len(classifiers) > 1
-            celeb_confidence = classifiers[0]['classes'][0]['score']
-            isPerson = 'person' in json.dumps(classifiers) or celeb_confidence > 0.6
-            
-            app.logger.info('isCelebrity: ' + str(isCelebrity) + ' isPerson:' + str(isPerson) + ' confidence:' + str(celeb_confidence) )
-
-            # 2 a person and celebrity look alike, send a template message carousel
-            if isCelebrity and isPerson:
-                sendMessage = createMessageTemplate(classifiers, sender_image_id)
-            # 3 a celebrity lookalike but not a person
-            elif isCelebrity:
-                type_class = classifiers[1]['classes'][0]['class']
-                celeb = celeb_db.findRecordWithId(classifiers[0]['classes'][0]['class'])
-                sendMessage = TextSendMessage(text='Funny, that looks like my friend ' + celeb['local_name'] + ' but that is a ' + type_class)
-            # TODO: 4 a person, call detect_face send a single template message, 
-            elif isPerson:
-                type_class = classifiers[0]['classes'][0]['class']
-                sendMessage = TextSendMessage(text='You don\'t look like any celebrities, but you look like a ' + type_class)
-                #call v3/detect_face
-            # 5 others. send a text message
             else:
-                type_class = classifiers[0]['classes'][0]['class']
-                app.logger.info('not human but a type_class: ' + type_class)
-                text = "Is that a " + type_class + "? If I'm mistaken, please take a clearer picture of yourself."
-                sendMessage = TextSendMessage(text=text)
+                sendMessage = getMessageForClassifier(classifiers)            
         else:
             continue
 
@@ -187,7 +159,35 @@ def classifyImageMessage(image_url):
     else:
         return 0
 
-# Create a carouse; message template if user looks like a celebrity
+# Analyze classifiers first the return specific message 
+def getMessageForClassifier(classifiers):
+    isCelebrity = len(classifiers) > 1
+    celeb_confidence = classifiers[0]['classes'][0]['score']
+    isPerson = 'person' in json.dumps(classifiers) or celeb_confidence > 0.6
+    
+    app.logger.info('isCelebrity: ' + str(isCelebrity) + ' isPerson:' + str(isPerson) + ' confidence:' + str(celeb_confidence) )
+
+    # 1 a person and celebrity look alike, send a template message carousel
+    if isCelebrity and isPerson:
+        return createMessageTemplate(classifiers, sender_image_id)
+    # 2 a celebrity lookalike but not a person
+    elif isCelebrity:
+        type_class = classifiers[1]['classes'][0]['class']
+        celeb = celeb_db.findRecordWithId(classifiers[0]['classes'][0]['class'])
+        return TextSendMessage(text='Funny, that looks like my friend ' + celeb['local_name'] + ' but that is a ' + type_class)
+    # TODO: 3 a person, call detect_face send a single template message, 
+    elif isPerson:
+        type_class = classifiers[0]['classes'][0]['class']
+        return TextSendMessage(text='You don\'t look like any celebrities, but you look like a ' + type_class)
+        #call v3/detect_face
+    # 4 others. send a text message
+    else:
+        type_class = classifiers[0]['classes'][0]['class']
+        app.logger.info('not human but a type_class: ' + type_class)
+        text = "Is that a " + type_class + "? If I'm mistaken, please take a clearer picture of yourself."
+        return TextSendMessage(text=text)
+
+# Create a carousel message template if user looks like a celebrity
 def createMessageTemplate(classifiers, sender_image_id=None):
     columns = []
     for index, celeb_class in enumerate(classifiers[0]['classes']):
@@ -323,11 +323,15 @@ def analyzePostbackEvent(event):
     if 'action=tryme' in data:
         sendMessage = None
         if 'user_id' in data:
-            # use profile picture of user to classify
+            # Use profile picture of user to classify
             user_id = data.split('&')[1].split('=')[1]
             pic_url = getProfilePictureUrl(user_id)
             classifier = classifyImageMessage(pic_url)
-            sendMessage = createMessageTemplate(classifier)
+            # Check if no classifier found, send a text message
+            if classifiers == 0:
+                sendMessage = TextSendMessage(text='I\'m sorry but your image is out of this world.')
+            else:
+                sendMessage = getMessageForClassifier(classifiers)            
         else:
             sendMessage = TextSendMessage(text='Please send me a picture of yourself.')
 
