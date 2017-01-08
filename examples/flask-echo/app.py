@@ -198,7 +198,7 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
     #celeb_confidence = classifiers[0]['classes'][0]['score']
     isPerson = 'person' in json.dumps(classifiers) #or celeb_confidence > 0.6
     
-    app.logger.debug('isCelebrity: {0} isPerson: {1} confidence: {2}'.format(str(isCelebrity), str(isPerson), str(celeb_confidence)))
+    app.logger.debug('isCelebrity: {0} isPerson: {1}'.format(str(isCelebrity), str(isPerson)))
 
     # 1 a person and celebrity look alike, send a template message carousel
     if isCelebrity and isPerson:
@@ -251,13 +251,23 @@ def createMessageTemplate(classifiers, sender_image_id=None):
                 MessageTemplateAction(
                     label='Disagree',
                     text='I think ' + gender + ' is ' + compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
-                ),
-                URITemplateAction(
-                    label='Share to friends',
-                    uri='line://nv/recommendOA/@' + oa_id
                 )
             ]
         )
+        if index % 2 == 0:
+            temp.actions.append(
+                URITemplateAction(
+                        label='Share to friends',
+                        uri='line://nv/recommendOA/@' + oa_id
+                    )
+                )
+        else:
+            temp.actions.append(
+                URITemplateAction(
+                        label='Add me as a friend',
+                        uri='line://oaMessage/@' + oa_id +'/hello'
+                    )
+                )
         columns.append(temp)
 
     carousel_template_message = TemplateSendMessage(
