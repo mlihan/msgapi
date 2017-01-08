@@ -234,7 +234,7 @@ def createMessageTemplate(classifiers, sender_image_id=None):
         gender = 'she'
         if celeb['sex'] == 'male':
             gender = 'he'
-
+        celeb['image_url'] = celeb['image_url'][:44] + 'c_fill,g_face:center,h_340,w_512' + celeb['image_url'][44:]
         title = gender + ' looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
 
         temp = CarouselColumn(
@@ -340,7 +340,7 @@ def createImageMessage(data):
 
 # compute look alike score of a celebrity
 def computeScore(json_score):
-    magic_num = 10
+    magic_num = 0
     score = (json_score * 100) + magic_num
     if score >= 100:
         score = 99
