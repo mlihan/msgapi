@@ -228,6 +228,8 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
 def createMessageTemplate(classifiers, sender_image_id=None):
     columns = []
     for index, celeb_class in enumerate(classifiers[0]['classes']):
+        if index == 5:
+            break
         celeb = celeb_db.findRecordWithId(celeb_class['class'])
         score = computeScore(celeb_class['score'])
         app.logger.debug('Carousel index: {0} for {1} score:'.format(str(index), str(celeb['en_name'])))
