@@ -234,7 +234,8 @@ def createMessageTemplate(classifiers, sender_image_id=None):
         gender = 'she'
         if celeb['sex'] == 'male':
             gender = 'he'
-        celeb['image_url'] = celeb['image_url'][:44] + 'c_fill,g_face:center,h_340,w_512' + celeb['image_url'][44:]
+        celeb['image_url'] = celeb['image_url'][:45] + 'c_fill,g_face:center,h_340,w_512/' + celeb['image_url'][45:]
+        app.logger.debug('image_url' + celeb['image_url'])
         title = gender + ' looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
 
         temp = CarouselColumn(
@@ -303,8 +304,8 @@ def createImageMessage(data):
     score = data.split('&')[3].split('=')[1]
     url = 'https://res.cloudinary.com/' \
         '{0}/image/upload/c_fill,g_face:center,l_' \
-        '{1},w_225,h_400,x_-128/c_fill,g_face:center,l_' \
-        '{2},w_256,h_400,x_128/c_scale,g_south,h_100,l_logo_w_name/l_text:Verdana_35_bold:Similarity%20' \
+        '{1},w_225,h_400,x_-128,y_-20/c_fill,g_face:center,l_' \
+        '{2},w_256,h_400,x_128,y_-20/c_scale,g_south,h_100,l_logo_w_name/l_text:Verdana_35_bold:Similarity%20' \
         '{3}%25,co_rgb:990C47,y_155,g_north,y_10/result.jpg' \
         .format(cloudinary_cloud, celeb_img_id, sender_img_id, score)
 
