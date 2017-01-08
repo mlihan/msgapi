@@ -115,7 +115,7 @@ def callback():
             if classifiers == 0:
                 sendMessage = TextSendMessage(text='I\'m sorry but your image is out of this world.')
             else:
-                sendMessage = getMessageForClassifier(classifiers)            
+                sendMessage = getMessageForClassifier(classifiers, sender_image_id)            
         else:
             continue
 
@@ -160,7 +160,7 @@ def classifyImageMessage(image_url):
         return 0
 
 # Analyze classifiers first the return specific message 
-def getMessageForClassifier(classifiers):
+def getMessageForClassifier(classifiers, sender_image_id=None):
     isCelebrity = len(classifiers) > 1
     celeb_confidence = classifiers[0]['classes'][0]['score']
     isPerson = 'person' in json.dumps(classifiers) or celeb_confidence > 0.6
