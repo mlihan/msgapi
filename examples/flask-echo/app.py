@@ -183,7 +183,7 @@ def classifyImageMessage(image_url):
     except:
         app.logger.error('Unexpected errer' + + sys.exc_info()[0])
         return 0
-    app.logger.debug(json.dumps(respon  se, indent=2))
+    app.logger.debug(json.dumps(response, indent=2))
 
     # check if a classifier is detected in the image
     if 'classifiers' in json.dumps(response):
