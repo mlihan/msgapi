@@ -237,7 +237,7 @@ def createMessageTemplate(sorted_list, max_index=2, sender_image_id=None):
                 gender = 'he'
             else:
                 gender = 'she'
-        elif index > 0 and celeb['sex'] != gender
+        elif index > 0 and celeb['sex'] != gender:
             continue
 
         score = computeScore(celeb_class['score'])
@@ -360,7 +360,7 @@ def createImageMessage(data):
 
 # compute look alike score of a celebrity
 def computeScore(json_score):
-    magic_num = 0
+    magic_num = -10
     score = (json_score * 100) + magic_num
     if score >= 100:
         score = 99
