@@ -92,28 +92,28 @@ def callback():
         # For bluemix
         if isinstance(event, FollowEvent):
             # If user just added me, send welcome and confirm message
-            app.logger.info('event FollowEvent: ' + str(event) )
+            app.logger.info('[EVENTLOG] FollowEvent: ' + str(event) )
             sendMessage = []
             sendMessage.append(createWelcomeMessage())
             sendMessage.append(createConfirmMessage(event.source.user_id))
         elif isinstance(event, JoinEvent):
             # If user invited me to a group, send confirm message
-            app.logger.info('event JoinEvent: ' + str(event) )
+            app.logger.info('[EVENTLOG] JoinEvent: ' + str(event) )
             sendMessage = createConfirmMessage()
         elif isinstance(event, PostbackEvent):
             # For postback events
-            app.logger.info('event PostbackEvent: ' + str(event) )
+            app.logger.info('[EVENTLOG] PostbackEvent: ' + str(event) )
             sendMessage = analyzePostbackEvent(event)
         elif isinstance(event, MessageEvent) and isinstance(event.message, ImageMessage):
             # If user sends an image, save content
-            app.logger.info('event MessageEvent(Image): ' + str(event) )
+            app.logger.info('[EVENTLOG] MessageEvent(Image): ' + str(event) )
             image_url, sender_image_id = saveContentImage(event)
             # classify the image 
             classifiers = classifyImageMessage(image_url)
 
             # Check if no classifier found, send a text message
             if classifiers == 0:
-                sendMessage = TextSendMessage(text='I\'m sorry but your image is out of this world.')
+                sendMessage = TextSendMessage(text='I\'m sorry but your image is out of this world. Please try another image.')
             else:
                 sendMessage = getMessageForClassifier(classifiers, sender_image_id)            
         else:
@@ -123,6 +123,36 @@ def callback():
 
     return 'OK'
 
+# analyze postback action
+def analyzePostbackEvent(event):
+    data = str(event.postback.data)
+    if 'action=tryme' in data:
+        app.logger.info('[EVENTLOG] Postback tryme Event: {0}'.format(data) )
+        sendMessage = None
+        if 'user_id' in data:
+            # Use profile picture of user to classify
+            user_id = data.split('&')[1].split('=')[1]
+            pic_url = getProfilePictureUrl(user_id)
+            image_url, image_id = image_management.upload(pic_url, 'user_profile')
+            classifiers = classifyImageMessage(image_url)
+
+            # Check if no classifier found, send a text message
+            if classifiers == 0:
+                sendMessage = TextSendMessage(text='I\'m sorry but your image is out of this world. Please try another image.')
+            else:
+                sendMessage = getMessageForClassifier(classifiers, image_id)            
+        else:
+            sendMessage = TextSendMessage(text='Please send me a picture of yourself.')
+
+    elif 'action=agree' in data:
+        app.logger.info('[EVENTLOG] Postback agree Event: {0}'.format(data) )
+        sendMessage = []
+        sendMessage.append(createImageMessage(data))
+        sendMessage.append(createConfirmMessage())
+
+    return sendMessage
+
+
 # Save image to cloudinary 
 def saveContentImage(event):
     #app.logger.info(str(event))
@@ -131,13 +161,13 @@ def saveContentImage(event):
         image_binary = message_content.content 
 
         # save image to cloudinary
-        fp = open("temp_img", 'wb') 
+        fp = open('temp_img', 'wb') 
         fp.write(image_binary)
         fp.close()
-        image_url, image_id = image_management.upload(event.message.id, 'temp_img')
+        image_url, image_id = image_management.upload('temp_img', 'user')
         return image_url, image_id
     except:
-        app.logger.error("Unexpected error:" + sys.exc_info()[0])
+        app.logger.error('Unexpected error:' + sys.exc_info()[0])
         return 'NG'
 
 # Classify image in Bluemix
@@ -151,7 +181,7 @@ def classifyImageMessage(image_url):
         classifier_ids=[bluemix_classifier, 'default'], 
         threshold=threshold
         )
-    app.logger.info(json.dumps(response, indent=2))
+    app.logger.debug(json.dumps(response, indent=2))
 
     # check if a classifier is detected in the image
     if 'classifiers' in json.dumps(response):
@@ -165,26 +195,28 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
     celeb_confidence = classifiers[0]['classes'][0]['score']
     isPerson = 'person' in json.dumps(classifiers) or celeb_confidence > 0.6
     
-    app.logger.info('isCelebrity: ' + str(isCelebrity) + ' isPerson:' + str(isPerson) + ' confidence:' + str(celeb_confidence) )
+    app.logger.debug('isCelebrity: {0} isPerson: {1} confidence: {2}'.format(str(isCelebrity), str(isPerson), str(celeb_confidence)))
 
     # 1 a person and celebrity look alike, send a template message carousel
     if isCelebrity and isPerson:
+        app.logger.info('[MATCH FOUND]')
         return createMessageTemplate(classifiers, sender_image_id)
     # 2 a celebrity lookalike but not a person
     elif isCelebrity:
+        app.logger.info('[CELEB ONLY]')
         type_class = classifiers[1]['classes'][0]['class']
         celeb = celeb_db.findRecordWithId(classifiers[0]['classes'][0]['class'])
-        return TextSendMessage(text='Funny, that looks like my friend ' + celeb['local_name'] + ' but that is a ' + type_class)
+        return TextSendMessage(text='Funny, that looks like my friend {0} but it\'s more is a {1}'.format(celeb['local_name'], type_class))
     # TODO: 3 a person, call detect_face send a single template message, 
     elif isPerson:
+        app.logger.info('[PERSON ONLY]')
         type_class = classifiers[0]['classes'][0]['class']
-        return TextSendMessage(text='You don\'t look like any celebrities, but you look like a ' + type_class)
+        return TextSendMessage(text='You don\'t look like any celebrities, but you look like a {0}. Please try another image.'.format(type_class))
         #call v3/detect_face
     # 4 others. send a text message
     else:
         type_class = classifiers[0]['classes'][0]['class']
-        app.logger.info('not human but a type_class: ' + type_class)
-        text = "Is that a " + type_class + "? If I'm mistaken, please take a clearer picture of yourself."
+        text = "Is that a {0}? If I'm mistaken, please take a clearer picture of yourself.".format(type_class)
         return TextSendMessage(text=text)
 
 # Create a carousel message template if user looks like a celebrity
@@ -193,7 +225,7 @@ def createMessageTemplate(classifiers, sender_image_id=None):
     for index, celeb_class in enumerate(classifiers[0]['classes']):
         celeb = celeb_db.findRecordWithId(celeb_class['class'])
         score = computeScore(celeb_class['score'])
-        app.logger.info('Carousel index:' + str(index) + ' for ' + str(celeb['en_name']) + ' score: ' + str(score))
+        app.logger.debug('Carousel index: {0} for {1} score: {2}'.format(str(index), str(celeb['en_name']), str(score)))
         gender = 'she'
         if celeb['sex'] == 'male':
             gender = 'he'
@@ -271,7 +303,7 @@ def createImageMesssage(data):
         '{3}%25,co_rgb:990C47,y_155,g_north,y_10/template.jpg' \
         .format(cloudinary_cloud, celeb_img_id, sender_img_id, score)
 
-    app.logger.info('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score + ' url:' + url)    
+    app.logger.debug('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score + ' url:' + url)    
     template = ImageSendMessage(
                 original_content_url=url,
                 preview_image_url=url
@@ -313,35 +345,9 @@ def computeScore(json_score):
 def getProfilePictureUrl(user_id):
     try:
         profile = line_bot_api.get_profile(user_id)
-        app.logger.error('pic url:' + profile.picture_url)
         return profile.picture_url
     except:
         app.logger.error('Unexpected error found: ' + str(e))
-
-# analyze postback action
-def analyzePostbackEvent(event):
-    data = str(event.postback.data)
-    if 'action=tryme' in data:
-        sendMessage = None
-        if 'user_id' in data:
-            # Use profile picture of user to classify
-            user_id = data.split('&')[1].split('=')[1]
-            pic_url = getProfilePictureUrl(user_id)
-            classifiers = classifyImageMessage(pic_url)
-            # Check if no classifier found, send a text message
-            if classifiers == 0:
-                sendMessage = TextSendMessage(text='I\'m sorry but your image is out of this world.')
-            else:
-                sendMessage = getMessageForClassifier(classifiers)            
-        else:
-            sendMessage = TextSendMessage(text='Please send me a picture of yourself.')
-
-    elif 'action=agree' in data:
-        sendMessage = []
-        sendMessage.append(createImageMessage(data))
-        sendMessage.append(createConfirmMessage())
-
-    return sendMessage
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser(
