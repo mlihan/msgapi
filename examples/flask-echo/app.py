@@ -209,7 +209,7 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
         app.logger.info('[CELEB ONLY]')
         type_class = classifiers[1]['classes'][0]['class']
         celeb = celeb_db.findRecordWithId(classifiers[0]['classes'][0]['class'])
-        return TextSendMessage(text='It looks more like a {1} to me'.format(type_class))
+        return TextSendMessage(text='It looks more like a {0} to me'.format(type_class))
     # TODO: 3 a person, call detect_face send a single template message, 
     elif isPerson:
         app.logger.info('[PERSON ONLY]')
