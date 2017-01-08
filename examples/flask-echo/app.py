@@ -195,8 +195,8 @@ def classifyImageMessage(image_url):
 # Analyze classifiers first the return specific message 
 def getMessageForClassifier(classifiers, sender_image_id=None):
     isCelebrity = len(classifiers) > 1
-    celeb_confidence = classifiers[0]['classes'][0]['score']
-    isPerson = 'person' in json.dumps(classifiers) or celeb_confidence > 0.6
+    #celeb_confidence = classifiers[0]['classes'][0]['score']
+    isPerson = 'person' in json.dumps(classifiers) #or celeb_confidence > 0.6
     
     app.logger.debug('isCelebrity: {0} isPerson: {1} confidence: {2}'.format(str(isCelebrity), str(isPerson), str(celeb_confidence)))
 
@@ -209,7 +209,7 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
         app.logger.info('[CELEB ONLY]')
         type_class = classifiers[1]['classes'][0]['class']
         celeb = celeb_db.findRecordWithId(classifiers[0]['classes'][0]['class'])
-        return TextSendMessage(text='Funny, that looks like my friend {0} but it\'s more is a {1}'.format(celeb['local_name'], type_class))
+        return TextSendMessage(text='It looks more like a {1} to me'.format(type_class))
     # TODO: 3 a person, call detect_face send a single template message, 
     elif isPerson:
         app.logger.info('[PERSON ONLY]')
