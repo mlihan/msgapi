@@ -151,7 +151,6 @@ def analyzePostbackEvent(event):
 
     return sendMessage
 
-
 # Save image to cloudinary 
 def saveContentImage(event):
     #app.logger.info(str(event))
@@ -195,15 +194,16 @@ def classifyImageMessage(image_url):
 # Analyze classifiers first the return specific message 
 def getMessageForClassifier(classifiers, sender_image_id=None):
     isCelebrity = len(classifiers) > 1
-    #celeb_confidence = classifiers[0]['classes'][0]['score']
-    isPerson = 'person' in json.dumps(classifiers) #or celeb_confidence > 0.6
+    sorted_list = sorted(classifiers[0]['classes'], key=lambda k:(-float(k['score'])))
+    app.logger.debug('sorted: ' + str(sorted_list))
+    isPerson = 'person' in json.dumps(classifiers) or celeb_confidence > 0.98
     
-    app.logger.debug('isCelebrity: {0} isPerson: {1}'.format(str(isCelebrity), str(isPerson)))
+    app.logger.debug('isCelebrity: {0} isPerson: {1} celeb_confidence: {2}'.format(str(isCelebrity), str(isPerson), str(celeb_confidence)))
 
     # 1 a person and celebrity look alike, send a template message carousel
     if isCelebrity and isPerson:
         app.logger.info('[MATCH FOUND]')
-        return createMessageTemplate(classifiers, sender_image_id)
+        return createMessageTemplate(sorted_list, randint(1,3), sender_image_id)
     # 2 a celebrity lookalike but not a person
     elif isCelebrity:
         app.logger.info('[CELEB ONLY]')
@@ -223,17 +223,26 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
         return TextSendMessage(text=text)
 
 # Create a carousel message template if user looks like a celebrity
-def createMessageTemplate(classifiers, sender_image_id=None):
+def createMessageTemplate(sorted_list, max_index=2, sender_image_id=None):
     columns = []
-    for index, celeb_class in enumerate(classifiers[0]['classes']):
-        if index == 5:
+    gender = ''
+    for index, celeb_class in enumerate(sorted_list):
+        # stop creating after max_index
+        if index == max_index:
             break
+
         celeb = celeb_db.findRecordWithId(celeb_class['class'])
+        if index == 0:
+            if celeb['sex'] == 'male':
+                gender = 'he'
+            else:
+                gender = 'she'
+        elif index > 0 and celeb['sex'] != gender
+            continue
+
         score = computeScore(celeb_class['score'])
         app.logger.debug('Carousel index: {0} for {1} score:'.format(str(index), str(celeb['en_name'])))
-        gender = 'she'
-        if celeb['sex'] == 'male':
-            gender = 'he'
+        
         celeb['image_url'] = celeb['image_url'][:45] + 'c_fill,g_face:center,h_340,w_512/' + celeb['image_url'][45:]
         app.logger.debug('image_url' + celeb['image_url'])
         title = gender + ' looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
