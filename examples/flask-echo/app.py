@@ -95,7 +95,7 @@ def callback():
 
             # If user just added me, send welcome and confirm message
             sendMessage = []
-            sendMessage.append(createWelcomeMessage(event.source.userId))
+            sendMessage.append(createWelcomeMessage(event.source.user_id))
             sendMessage.append(createConfirmMessage())
         elif isinstance(event, JoinEvent):
             app.logger.info('event JoinEvent: ' + str(event) )
