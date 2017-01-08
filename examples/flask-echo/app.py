@@ -196,7 +196,6 @@ def classifyImageMessage(image_url):
 def getMessageForClassifier(classifiers, sender_image_id=None):
     isCelebrity = len(classifiers) > 1
     sorted_list = sorted(classifiers[0]['classes'], key=lambda k:(-float(k['score'])))
-    app.logger.debug('sorted: ' + str(sorted_list))
     max_confidence = sorted_list[0]['score']
     isPerson = 'person' in json.dumps(classifiers) or max_confidence > 0.97
     
@@ -229,6 +228,7 @@ def createMessageTemplate(sorted_list, max_index=2, sender_image_id=None):
     columns = []
     gender = ''
     for index, celeb_class in enumerate(sorted_list):
+        app.logger.debug('max_index:' + str(max_index) + ' index:' + str(index))
         # stop creating after max_index
         if index == max_index:
             break
