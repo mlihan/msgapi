@@ -277,40 +277,31 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
             actions=[
                 PostbackTemplateAction(
                     label=u'Agree 同意',
-                    text= 'Agree ',
+                    text=u'Agree 同意',
                     data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
-                ),
+                ),                
                 MessageTemplateAction(
-                    label='message1',
-                    text='message text1'
-                ),
-                URITemplateAction(
-                    label='uri1',
-                    uri='http://example.com/1'
+                    label=u'Disagree 不同意',
+                    text='Disagree.' 
                 )
-                
-                # MessageTemplateAction(
-                #     label='Disagree 不同意',
-                #     text='Disagree.' 
-                # )
             ]
         )
-        # if index % 2 == 0:
-        #     app.logger.debug('asdf1')
-        #     temp.actions.append(
-        #         URITemplateAction(
-        #                 label='Share to friends 分享好友',
-        #                 uri='line://nv/recommendOA/@' + oa_id
-        #             )
-        #         )
-        # else:
-        #     app.logger.debug('asdf2')
-        #     temp.actions.append(
-        #         URITemplateAction(
-        #                 label='Add me as a friend 加我好友',
-        #                 uri='line://oaMessage/@' + oa_id +'/hello'
-        #             )
-        #         )
+        if index % 2 == 0:
+            app.logger.debug('asdf1')
+            temp.actions.append(
+                URITemplateAction(
+                        label=u'Share to friends 分享好友',
+                        uri='line://nv/recommendOA/@' + oa_id
+                    )
+                )
+        else:
+            app.logger.debug('asdf2')
+            temp.actions.append(
+                URITemplateAction(
+                        label=u'Add me as a friend 加我好友',
+                        uri='line://oaMessage/@' + oa_id +'/hello'
+                    )
+                )
         columns.append(temp)
 
     carousel_template_message = TemplateSendMessage(
@@ -337,8 +328,8 @@ def createConfirmMessage(user_id=None):
             text='Do you want to know which celebrity you look like? 想知道您的LINE大頭照像那位明星嗎？',
             actions=[
                 PostbackTemplateAction(
-                    label='Yes! 想！',
-                    text='Yes! 想！',
+                    label=u'Yes! 想！',
+                    text=u'Yes! 想！',
                     data=data
                 ),
                 MessageTemplateAction(
