@@ -265,7 +265,8 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
         # compute score based on api and index
         score = computeScore(celeb_class['score'], index)
         
-        app.logger.debug('Carousel index: {0} for {1} score: {2} age: {3}'.format(str(index), str(celeb['en_name']), str(score), str(age))
+        app.logger.debug('Carousel index: {0} for {1} score: {2} age: {3}'.format(
+            str(index), str(celeb['en_name']), str(score), str(age)))
         # use image with face centered
         celeb['image_url'] = celeb['image_url'][:45] + 'c_fill,g_face:center,h_340,w_512/' + celeb['image_url'][45:]
         title = 'Your picture looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
