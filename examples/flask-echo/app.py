@@ -208,7 +208,7 @@ def hasFaceFromImageMessage(image_url):
     if 'gender' in json.dumps(response):
         first_face = response['images'][0]['faces'][0]
         gender = first_face['gender']['gender']
-        age = first_face['age']['max'] - randint(1,10)
+        age = first_face['age']['max'] - 5
         return gender, age
     else:
         return None, None
@@ -257,8 +257,9 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
         celeb = celeb_db.findRecordWithId(celeb_class['class'])
 
         # skip celeb with different gender
-        if gender != celeb['sex']:
+        if gender.lower() != celeb['sex']:
             app.logger.debug('Skipping {0} because user gender is {1}'.format(celeb['en_name'], gender))
+            max_index = max_index + 1 
             continue
 
         # compute score based on api and index
@@ -272,12 +273,12 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
         temp = CarouselColumn(
             thumbnail_image_url=celeb['image_url'],
             title=title[:39],
-            text='Score: ' + score + '%',
+            text='Age:' + age + 'Score: ' + score + '%',
             actions=[
                 PostbackTemplateAction(
                     label='Agree 同意',
                     text= 'Wow! ' + celeb['local_name'],
-                    data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score)
+                    data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
                 ),
                 MessageTemplateAction(
                     label='Disagree 不同意',
@@ -286,7 +287,6 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
             ]
         )
         if index % 2 == 0:
-            app.logger.debug('hi1')
             temp.actions.append(
                 URITemplateAction(
                         label='Share to friends 分享好友',
@@ -294,7 +294,6 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
                     )
                 )
         else:
-            app.logger.debug('hi2')
             temp.actions.append(
                 URITemplateAction(
                         label='Add me as a friend 加我好友',
