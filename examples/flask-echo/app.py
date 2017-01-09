@@ -258,11 +258,12 @@ def createMessageTemplate(sorted_list, max_index=2, sender_image_id=None):
                 gender = 'he'
             else:
                 gender = 'she'
-        elif index > 0 and celeb['sex'] != gender:
-            continue
-
         score = computeScore(celeb_class['score'])
-        app.logger.debug('Carousel index: {0} for {1} score: {2}'.format(str(index), str(celeb['en_name']),str(score)))
+        app.logger.debug('Carousel index: {0} for {1} score: {2} top_gender: {3}'.format(str(index), str(celeb['en_name']), str(score), gender))
+        
+        if index > 0 and celeb['sex'] != gender:
+            max_index = max_index+1
+            continue
         
         celeb['image_url'] = celeb['image_url'][:45] + 'c_fill,g_face:center,h_340,w_512/' + celeb['image_url'][45:]
         app.logger.debug('image_url' + celeb['image_url'])
