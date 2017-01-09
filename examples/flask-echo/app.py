@@ -182,7 +182,7 @@ def classifyImageMessage(image_url):
         threshold=threshold
         )
     except:
-        app.logger.error('Unexpected errer' + + sys.exc_info()[0])
+        app.logger.error('Unexpected errer' + sys.exc_info()[0])
         return 0
     app.logger.debug(json.dumps(response, indent=2))
 
@@ -200,7 +200,7 @@ def hasFaceFromImageMessage(image_url):
         images_url=image_url
         )
     except:
-        app.logger.error('Unexpected errer' + + sys.exc_info()[0])
+        app.logger.error('Unexpected errer' + sys.exc_info()[0])
         return 0
     app.logger.debug(json.dumps(response, indent=2))
 
@@ -262,7 +262,6 @@ def createMessageTemplate(sorted_list, max_index=2, sender_image_id=None):
         app.logger.debug('Carousel index: {0} for {1} score: {2} top_gender: {3}'.format(str(index), str(celeb['en_name']), str(score), gender))
         
         if index > 0 and celeb['sex'] != gender:
-            max_index = max_index+1
             continue
         
         celeb['image_url'] = celeb['image_url'][:45] + 'c_fill,g_face:center,h_340,w_512/' + celeb['image_url'][45:]
