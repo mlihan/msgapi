@@ -276,19 +276,31 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
             text='Age:' + str(age) + ' Score: ' + score + '%',
             actions=[
                 PostbackTemplateAction(
-                    label='Agree, check results 同意，看結果',
-                    text= 'Agree 同意',
-                    data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
+                    label='postback1',
+                    text='postback text1',
+                    data='action=buy&itemid=1'
                 ),
                 MessageTemplateAction(
-                    label='Disagree 不同意',
-                    text='Disagree.' 
+                    label='message1',
+                    text='message text1'
                 ),
                 URITemplateAction(
-                    label='Share to friends 分享好友',
-                    uri='line://nv/recommendOA/@' + oa_id
+                    label='uri1',
+                    uri='http://example.com/1'
                 )
-             
+                # PostbackTemplateAction(
+                #     label='Agree, check results 同意，看結果',
+                #     text= 'Agree 同意',
+                #     data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
+                # ),
+                # MessageTemplateAction(
+                #     label='Disagree 不同意',
+                #     text='Disagree.' 
+                # ),
+                # URITemplateAction(
+                #     label='Share to friends 分享好友',
+                #     uri='line://nv/recommendOA/@' + oa_id
+                # )
             ]
         )
         # if index % 2 == 0:
