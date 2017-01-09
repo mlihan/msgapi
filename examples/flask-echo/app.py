@@ -192,12 +192,31 @@ def classifyImageMessage(image_url):
     else:
         return 0
 
+# Classify image in Bluemix
+def hasFaceFromImageMessage(image_url):
+    #call v3/detect_faces
+    try: 
+        response = visual_recognition.detect_faces(
+        images_url=image_url
+        )
+    except:
+        app.logger.error('Unexpected errer' + + sys.exc_info()[0])
+        return 0
+    app.logger.debug(json.dumps(response, indent=2))
+
+    # check if a classifier is detected in the image
+    if 'gender' in json.dumps(response):
+        return True
+    else:
+        return False
+
 # Analyze classifiers first the return specific message 
 def getMessageForClassifier(classifiers, sender_image_id=None):
     isCelebrity = len(classifiers) > 1
     sorted_list = sorted(classifiers[0]['classes'], key=lambda k:(-float(k['score'])))
     max_confidence = sorted_list[0]['score']
-    isPerson = 'person' in json.dumps(classifiers) or max_confidence > 0.97
+    image_url = 'https://res.cloudinary.com/{0}/image/upload/{1}.jpg'.format(cloudinary_cloud, sender_image_id)
+    isPerson = hasFaceFromImageMessage(image_url)
     
     app.logger.debug('isCelebrity: {0} isPerson: {1} celeb_confidence: {2}'.format(str(isCelebrity), str(isPerson), str(max_confidence)))
 
@@ -243,7 +262,7 @@ def createMessageTemplate(sorted_list, max_index=2, sender_image_id=None):
             continue
 
         score = computeScore(celeb_class['score'])
-        app.logger.debug('Carousel index: {0} for {1} score:'.format(str(index), str(celeb['en_name'])))
+        app.logger.debug('Carousel index: {0} for {1} score: {2}'.format(str(index), str(celeb['en_name']),str(score)))
         
         celeb['image_url'] = celeb['image_url'][:45] + 'c_fill,g_face:center,h_340,w_512/' + celeb['image_url'][45:]
         app.logger.debug('image_url' + celeb['image_url'])
