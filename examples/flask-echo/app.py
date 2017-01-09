@@ -149,7 +149,6 @@ def analyzePostbackEvent(event):
         sendMessage.append(createImageMessage(data))
         if event.source.type == 'group':
             sendMessage.append(createConfirmMessage())
-
     return sendMessage
 
 # Save image to cloudinary 
@@ -226,7 +225,7 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
     # 1 a person and celebrity look alike, send a template message carousel
     if isCelebrity and gender is not None:
         app.logger.info('[MATCH FOUND]')
-        return createMessageTemplate(sorted_list, gender, age, 2, sender_image_id)
+        return createMessageTemplate(sorted_list, gender, age, 3, sender_image_id)
     # 2 a celebrity lookalike but not a person
     elif isCelebrity:
         app.logger.info('[CELEB ONLY]')
@@ -273,17 +272,16 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
         temp = CarouselColumn(
             thumbnail_image_url=celeb['image_url'],
             title=title[:39],
-            text='Score: ' + score + '%',
+            text='Score: ' + score,
             actions=[
                 PostbackTemplateAction(
                     label='Agree 同意',
                     text='Agree',
                     data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
-                ),                
-                PostbackTemplateAction(
+                ),
+                MessageTemplateAction(
                     label='Disagree 不同意',
-                    text='Disagree.',
-                    data='action=disagree'
+                    text='Disagree.'
                 )
             ]
         )
@@ -349,8 +347,8 @@ def createImageMessage(data):
     url = 'https://res.cloudinary.com/' \
         '{0}/image/upload/c_fill,g_face:center,l_' \
         '{1},w_225,h_400,x_-128,y_-20/c_fill,g_face:center,l_' \
-        '{2},w_256,h_400,x_128,y_-20/c_scale,g_south,h_100,l_logo_w_name/l_text:Verdana_35_bold:Similarity%20' \
-        '{3}%25%20Age:%20{4},co_rgb:990C47,y_155,g_north,y_10/result.jpg' \
+        '{2},w_256,h_400,x_128,y_-20/c_scale,g_south,h_100,l_logo_w_name/l_text:Verdana_35_bold:Score%20' \
+        '{3}%20Age:%20{4},co_rgb:990C47,y_155,g_north,y_10/result.jpg' \
         .format(cloudinary_cloud, celeb_img_id, sender_img_id, score, age)
 
     app.logger.debug('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score + ' url:' + url)    
