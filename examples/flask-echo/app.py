@@ -221,7 +221,7 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
     image_url = 'https://res.cloudinary.com/{0}/image/upload/{1}.jpg'.format(cloudinary_cloud, sender_image_id)
     gender, age = hasFaceFromImageMessage(image_url)
     
-    app.logger.debug('isCelebrity: {0} isPerson: {1} max_confidence: {2} gender: {3} age: {4}'.format(str(isCelebrity), str(isPerson), str(max_confidence), str(gender), str(age)))
+    app.logger.debug('isCelebrity: {0} max_confidence: {1} gender: {2} age: {3}'.format(str(isCelebrity), str(max_confidence), str(gender), str(age)))
 
     # 1 a person and celebrity look alike, send a template message carousel
     if isCelebrity and gender is not None:
@@ -275,12 +275,12 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
             text='Age: ' + age + 'Score: ' + score + '%',
             actions=[
                 PostbackTemplateAction(
-                    label='Agree|同意',
+                    label='Agree 同意',
                     text= 'Wow! ' + celeb['local_name'],
                     data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age' + str(age)
                 ),
                 MessageTemplateAction(
-                    label='Disagree|不同意',
+                    label='Disagree 不同意',
                     text='Disagree.' 
                 )
             ]
@@ -288,14 +288,14 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
         if index % 2 == 0:
             temp.actions.append(
                 URITemplateAction(
-                        label='Share to friends|分享好友',
+                        label='Share to friends 分享好友',
                         uri='line://nv/recommendOA/@' + oa_id
                     )
                 )
         else:
             temp.actions.append(
                 URITemplateAction(
-                        label='Add me as a friend|加我好友',
+                        label='Add me as a friend 加我好友',
                         uri='line://oaMessage/@' + oa_id +'/hello'
                     )
                 )
@@ -322,16 +322,16 @@ def createConfirmMessage(user_id=None):
     confirm_template_message = TemplateSendMessage(
         alt_text='Please check message on your smartphone',
         template=ConfirmTemplate(
-            text='Do you want to know which celebrity you look like?|想知道您的LINE大頭照像那位明星嗎？',
+            text='Do you want to know which celebrity you look like? 想知道您的LINE大頭照像那位明星嗎？',
             actions=[
                 PostbackTemplateAction(
-                    label='Yes!想！',
-                    text='Yes!想！',
+                    label='Yes! 想！',
+                    text='Yes! 想！',
                     data=data
                 ),
                 MessageTemplateAction(
                     label='About Me',
-                    text='I\'m a bot that searches for a celebrities who look like you. Try and send me a picture! ｜ 你有明星臉嗎？快上傳自拍照，狗仔隊馬上為你揭曉！'
+                    text='I\'m a bot that searches for a celebrities who look like you. Try and send me a picture! 你有明星臉嗎？快上傳自拍照，狗仔隊馬上為你揭曉！'
                 )
             ]
         )
