@@ -285,7 +285,7 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
                     text='Disagree.'
                 ),
                 URITemplateAction(
-                    label='Share to friends 分享好友',
+                    label='Share to friends',
                     uri='line://nv/recommendOA/@' + oa_id
                 )
                 
