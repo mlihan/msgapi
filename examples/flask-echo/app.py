@@ -267,7 +267,7 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
         
         celeb['image_url'] = celeb['image_url'][:45] + 'c_fill,g_face:center,h_340,w_512/' + celeb['image_url'][45:]
         app.logger.debug('image_url' + celeb['image_url'])
-        title = 'You picture looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
+        title = 'Your picture looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
 
         temp = CarouselColumn(
             thumbnail_image_url=celeb['image_url'],
@@ -275,17 +275,18 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
             text='Score: ' + score + '%',
             actions=[
                 PostbackTemplateAction(
-                    label='Agree ',
+                    label='Agree 同意',
                     text= 'Wow! ' + celeb['local_name'],
-                    data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age' + str(age)
+                    data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score)
                 ),
                 MessageTemplateAction(
-                    label='Disagree',
+                    label='Disagree 不同意',
                     text='Disagree.' 
                 )
             ]
         )
         if index % 2 == 0:
+            app.logger.debug('hi1')
             temp.actions.append(
                 URITemplateAction(
                         label='Share to friends 分享好友',
@@ -293,6 +294,7 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
                     )
                 )
         else:
+            app.logger.debug('hi2')
             temp.actions.append(
                 URITemplateAction(
                         label='Add me as a friend 加我好友',
