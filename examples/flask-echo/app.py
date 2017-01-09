@@ -209,7 +209,6 @@ def hasFaceFromImageMessage(image_url):
         first_face = response['images'][0]['faces'][0]
         gender = first_face['gender']['gender']
         age = first_face['age']['max'] - randint(1,10)
-        app.logger.debug('age: {0} gender:{1}'.format(age, gender))
         return gender, age
     else:
         return None, None
@@ -273,15 +272,15 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
         temp = CarouselColumn(
             thumbnail_image_url=celeb['image_url'],
             title=title[:39],
-            text='Age: ' + str(age) + 'Score: ' + score + '%',
+            text='Score: ' + score + '%',
             actions=[
                 PostbackTemplateAction(
-                    label='Agree 同意',
+                    label='Agree ',
                     text= 'Wow! ' + celeb['local_name'],
                     data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age' + str(age)
                 ),
                 MessageTemplateAction(
-                    label='Disagree 不同意',
+                    label='Disagree',
                     text='Disagree.' 
                 )
             ]
