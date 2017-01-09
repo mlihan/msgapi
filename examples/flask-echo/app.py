@@ -166,7 +166,7 @@ def saveContentImage(event):
         image_url, image_id = image_management.upload('temp_img', 'user_image')
         return image_url, image_id
     except:
-        app.logger.error('Unexpected error:' + sys.exc_info()[0])
+        app.logger.error('Unexpected error:' + response.text)
         return 'NG'
 
 # Classify image in Bluemix
@@ -182,7 +182,7 @@ def classifyImageMessage(image_url):
         threshold=threshold
         )
     except:
-        app.logger.error('Unexpected errer' + sys.exc_info()[0])
+        app.logger.error('Unexpected errer' + response.text)
         return 0
     app.logger.debug(json.dumps(response, indent=2))
 
@@ -200,15 +200,18 @@ def hasFaceFromImageMessage(image_url):
         images_url=image_url
         )
     except:
-        app.logger.error('Unexpected errer' + sys.exc_info()[0])
+        app.logger.error('Unexpected error:' + json.dumps(response))
         return 0
-    app.logger.debug(json.dumps(response, indent=2))
+    app.logger.debug('detect_faces' + json.dumps(response, indent=2))
 
     # check if a classifier is detected in the image
     if 'gender' in json.dumps(response):
-        return True
+        first_face = response['images'][0]['faces'][0]
+        gender = first_face['gender']['gender']
+        age = round((first_face['age']['max'] - first_face['age']['min']) * first_face['age']['score'] + first_face['age']['min'])
+        return gender, age
     else:
-        return False
+        return None, None
 
 # Analyze classifiers first the return specific message 
 def getMessageForClassifier(classifiers, sender_image_id=None):
@@ -216,14 +219,14 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
     sorted_list = sorted(classifiers[0]['classes'], key=lambda k:(-float(k['score'])))
     max_confidence = sorted_list[0]['score']
     image_url = 'https://res.cloudinary.com/{0}/image/upload/{1}.jpg'.format(cloudinary_cloud, sender_image_id)
-    isPerson = hasFaceFromImageMessage(image_url)
+    gender, age = hasFaceFromImageMessage(image_url)
     
-    app.logger.debug('isCelebrity: {0} isPerson: {1} celeb_confidence: {2}'.format(str(isCelebrity), str(isPerson), str(max_confidence)))
+    app.logger.debug('isCelebrity: {0} isPerson: {1} max_confidence: {2} gender: {3} age: {4}'.format(str(isCelebrity), str(isPerson), str(max_confidence), str(gender), str(age)))
 
     # 1 a person and celebrity look alike, send a template message carousel
-    if isCelebrity and isPerson:
+    if isCelebrity and gender is not None:
         app.logger.info('[MATCH FOUND]')
-        return createMessageTemplate(sorted_list, randint(1,3), sender_image_id)
+        return createMessageTemplate(sorted_list, 2, sender_image_id, gender, age)
     # 2 a celebrity lookalike but not a person
     elif isCelebrity:
         app.logger.info('[CELEB ONLY]')
@@ -243,58 +246,56 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
         return TextSendMessage(text=text)
 
 # Create a carousel message template if user looks like a celebrity
-def createMessageTemplate(sorted_list, max_index=2, sender_image_id=None):
+def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id=None):
     columns = []
-    gender = ''
     for index, celeb_class in enumerate(sorted_list):
-        app.logger.debug('max_index:' + str(max_index) + ' index:' + str(index))
         # stop creating after max_index
         if index == max_index:
             break
 
+        # find celeb in DB
         celeb = celeb_db.findRecordWithId(celeb_class['class'])
-        if index == 0:
-            if celeb['sex'] == 'male':
-                gender = 'he'
-            else:
-                gender = 'she'
-        score = computeScore(celeb_class['score'])
-        app.logger.debug('Carousel index: {0} for {1} score: {2} top_gender: {3}'.format(str(index), str(celeb['en_name']), str(score), gender))
-        
-        if index > 0 and celeb['sex'] != gender:
+
+        # skip celeb with different gender
+        if gender != celeb['sex']:
+            app.logger.debug('Skipping {0} because user gender is {1}'.format(celeb['en_name'], gender))
             continue
+
+        # compute score based on api and index
+        score = computeScore(celeb_class['score'], index)
+        app.logger.debug('Carousel index: {0} for {1} score: {2}'.format(str(index), str(celeb['en_name']), str(score)))
         
         celeb['image_url'] = celeb['image_url'][:45] + 'c_fill,g_face:center,h_340,w_512/' + celeb['image_url'][45:]
         app.logger.debug('image_url' + celeb['image_url'])
-        title = gender + ' looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
+        title = 'You picture looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
 
         temp = CarouselColumn(
             thumbnail_image_url=celeb['image_url'],
             title=title[:39],
-            text='Score: ' + score + '%',
+            text='Age: ' + age + 'Score: ' + score + '%',
             actions=[
                 PostbackTemplateAction(
-                    label='Agree',
-                    text= 'I agree that ' + gender +' looks like ' + celeb['local_name'],
-                    data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score)
+                    label='Agree|同意',
+                    text= 'Wow! ' + celeb['local_name'],
+                    data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age' + str(age)
                 ),
                 MessageTemplateAction(
-                    label='Disagree',
-                    text='I think ' + gender + ' is ' + compliment.getRandomCompliment(celeb['sex']) + ' than ' + celeb['local_name'] 
+                    label='Disagree|不同意',
+                    text='Disagree.' 
                 )
             ]
         )
         if index % 2 == 0:
             temp.actions.append(
                 URITemplateAction(
-                        label='Share to friends',
+                        label='Share to friends|分享好友',
                         uri='line://nv/recommendOA/@' + oa_id
                     )
                 )
         else:
             temp.actions.append(
                 URITemplateAction(
-                        label='Add me as a friend',
+                        label='Add me as a friend|加我好友',
                         uri='line://oaMessage/@' + oa_id +'/hello'
                     )
                 )
@@ -321,16 +322,16 @@ def createConfirmMessage(user_id=None):
     confirm_template_message = TemplateSendMessage(
         alt_text='Please check message on your smartphone',
         template=ConfirmTemplate(
-            text='Do you want to know which celebrity you look like?',
+            text='Do you want to know which celebrity you look like?|想知道您的LINE大頭照像那位明星嗎？',
             actions=[
                 PostbackTemplateAction(
-                    label='Yes!',
-                    text='Yes! Who do I look like?',
+                    label='Yes!想！',
+                    text='Yes!想！',
                     data=data
                 ),
                 MessageTemplateAction(
                     label='About Me',
-                    text='I\'m a bot that searches for a celebrities who look like you. Try and send me a picture!'
+                    text='I\'m a bot that searches for a celebrities who look like you. Try and send me a picture! ｜ 你有明星臉嗎？快上傳自拍照，狗仔隊馬上為你揭曉！'
                 )
             ]
         )
@@ -342,11 +343,12 @@ def createImageMessage(data):
     celeb_img_id = data.split('&')[1].split('=')[1]
     sender_img_id = data.split('&')[2].split('=')[1]
     score = data.split('&')[3].split('=')[1]
+    age = data.split('&')[4].split('=')[1]
     url = 'https://res.cloudinary.com/' \
         '{0}/image/upload/c_fill,g_face:center,l_' \
         '{1},w_225,h_400,x_-128,y_-20/c_fill,g_face:center,l_' \
         '{2},w_256,h_400,x_128,y_-20/c_scale,g_south,h_100,l_logo_w_name/l_text:Verdana_35_bold:Similarity%20' \
-        '{3}%25,co_rgb:990C47,y_155,g_north,y_10/result.jpg' \
+        '{3}%25%20Age:%20\{4},co_rgb:990C47,y_155,g_north,y_10/result.jpg' \
         .format(cloudinary_cloud, celeb_img_id, sender_img_id, score)
 
     app.logger.debug('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score + ' url:' + url)    
