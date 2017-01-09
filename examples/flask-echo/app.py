@@ -276,9 +276,9 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
             text='Age:' + str(age) + ' Score: ' + score + '%',
             actions=[
                 PostbackTemplateAction(
-                    label='Agree',
-                    text= 'Agree',
-                    data='action=agree' #&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
+                    label=u'Agree 同意',
+                    text= 'Agree ',
+                    data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
                 ),
                 MessageTemplateAction(
                     label='message1',
@@ -292,10 +292,6 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
                 # MessageTemplateAction(
                 #     label='Disagree 不同意',
                 #     text='Disagree.' 
-                # ),
-                # URITemplateAction(
-                #     label='Share to friends 分享好友',
-                #     uri='line://nv/recommendOA/@' + oa_id
                 # )
             ]
         )
