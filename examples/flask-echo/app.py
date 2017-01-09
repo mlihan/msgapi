@@ -349,7 +349,7 @@ def createImageMessage(data):
         '{0}/image/upload/c_fill,g_face:center,l_' \
         '{1},w_225,h_400,x_-128,y_-20/c_fill,g_face:center,l_' \
         '{2},w_256,h_400,x_128,y_-20/c_scale,g_south,h_100,l_logo_w_name/l_text:Verdana_35_bold:Similarity%20' \
-        '{3}%25%20Age:%20\{4},co_rgb:990C47,y_155,g_north,y_10/result.jpg' \
+        '{3}%25%20Age:%20{4},co_rgb:990C47,y_155,g_north,y_10/result.jpg' \
         .format(cloudinary_cloud, celeb_img_id, sender_img_id, score, age)
 
     app.logger.debug('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score + ' url:' + url)    
