@@ -281,11 +281,11 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
                     data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
                 ),                
                 MessageTemplateAction(
-                    label='Disagree',
+                    label='Disagree 不同意',
                     text='Disagree.'
                 ),
                 URITemplateAction(
-                    label='Share to friends',
+                    label='Share to friends 分享好友',
                     uri='line://nv/recommendOA/@' + oa_id
                 )
                 
