@@ -208,7 +208,7 @@ def hasFaceFromImageMessage(image_url):
     if 'gender' in json.dumps(response):
         first_face = response['images'][0]['faces'][0]
         gender = first_face['gender']['gender']
-        age = round((first_face['age']['max'] - first_face['age']['min']) * first_face['age']['score'] + first_face['age']['min'])
+        age = first_face['age']['max'] - randint(1,10)
         return gender, age
     else:
         return None, None
