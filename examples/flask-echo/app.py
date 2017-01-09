@@ -264,21 +264,20 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
 
         # compute score based on api and index
         score = computeScore(celeb_class['score'], index)
-        app.logger.debug('Carousel index: {0} for {1} score: {2}'.format(str(index), str(celeb['en_name']), str(score)))
         
+        app.logger.debug('Carousel index: {0} for {1} score: {2}'.format(str(index), str(celeb['en_name']), str(score)))
+        # use image with face centered
         celeb['image_url'] = celeb['image_url'][:45] + 'c_fill,g_face:center,h_340,w_512/' + celeb['image_url'][45:]
-        app.logger.debug('image_url' + celeb['image_url'])
         title = 'Your picture looks like ' + celeb['local_name'] + ' (' + celeb['en_name'] + ')'
-
         temp = CarouselColumn(
             thumbnail_image_url=celeb['image_url'],
             title=title[:39],
             text='Age:' + str(age) + ' Score: ' + score + '%',
             actions=[
                 PostbackTemplateAction(
-                    label='postback1',
-                    text='postback text1',
-                    data='action=buy&itemid=1'
+                    label='Agree, check results 同意，看結果',
+                    text= 'Agree 同意',
+                    data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
                 ),
                 MessageTemplateAction(
                     label='message1',
@@ -288,11 +287,7 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
                     label='uri1',
                     uri='http://example.com/1'
                 )
-                # PostbackTemplateAction(
-                #     label='Agree, check results 同意，看結果',
-                #     text= 'Agree 同意',
-                #     data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
-                # ),
+                
                 # MessageTemplateAction(
                 #     label='Disagree 不同意',
                 #     text='Disagree.' 
