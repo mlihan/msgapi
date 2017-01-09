@@ -383,9 +383,9 @@ def createImageMessage(data):
     # return imagemap_message
 
 # compute look alike score of a celebrity
-def computeScore(json_score):
-    magic_num = -10
-    score = (json_score * 100) + magic_num
+def computeScore(json_score, index):
+    magic_num = index * 5
+    score = (json_score * 100) - magic_num
     if score >= 100:
         score = 99
     return str(round(score, 0))
