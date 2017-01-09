@@ -209,6 +209,7 @@ def hasFaceFromImageMessage(image_url):
         first_face = response['images'][0]['faces'][0]
         gender = first_face['gender']['gender']
         age = first_face['age']['max'] - randint(1,10)
+        app.logger.debug('age: {0} gender:{1}'.format(age, gender))
         return gender, age
     else:
         return None, None
@@ -272,7 +273,7 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
         temp = CarouselColumn(
             thumbnail_image_url=celeb['image_url'],
             title=title[:39],
-            text='Age: ' + age + 'Score: ' + score + '%',
+            text='Age: ' + str(age) + 'Score: ' + score + '%',
             actions=[
                 PostbackTemplateAction(
                     label='Agree 同意',
@@ -387,7 +388,7 @@ def computeScore(json_score):
     score = (json_score * 100) + magic_num
     if score >= 100:
         score = 99
-    return str(round(score, 2))
+    return str(round(score, 0))
 
 # get picture url of a profile
 def getProfilePictureUrl(user_id):
