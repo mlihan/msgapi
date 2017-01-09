@@ -278,7 +278,7 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
                 PostbackTemplateAction(
                     label='Agree, check results 同意，看結果',
                     text= 'Agree 同意',
-                    data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
+                    data='action=agree' #&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
                 ),
                 MessageTemplateAction(
                     label='message1',
