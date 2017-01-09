@@ -283,30 +283,23 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
                 MessageTemplateAction(
                     label='Disagree 不同意',
                     text='Disagree.'
-                ),
-                URITemplateAction(
-                    label='Share to friends',
-                    uri='line://nv/recommendOA/@' + oa_id
                 )
-                
             ]
         )
-        # if index % 2 == 0:
-        #     app.logger.debug('asdf1')
-        #     temp.actions.append(
-        #         URITemplateAction(
-        #                 label=u'Share to friends 分享好友',
-        #                 uri='line://nv/recommendOA/@' + oa_id
-        #             )
-        #         )
-        # else:
-        #     app.logger.debug('asdf2')
-        #     temp.actions.append(
-        #         URITemplateAction(
-        #                 label=u'Add me as a friend 加我好友',
-        #                 uri='line://oaMessage/@' + oa_id +'/hello'
-        #             )
-        #         )
+        if index % 2 == 0:
+            temp.actions.append(
+                URITemplateAction(
+                        label=u'Share to friends',
+                        uri='line://nv/recommendOA/@' + oa_id
+                    )
+                )
+        else:
+            temp.actions.append(
+                URITemplateAction(
+                        label=u'Add me as a friend',
+                        uri='line://oaMessage/@' + oa_id +'/hello'
+                    )
+                )
         columns.append(temp)
 
     carousel_template_message = TemplateSendMessage(
