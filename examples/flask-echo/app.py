@@ -227,7 +227,7 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
     # 1 a person and celebrity look alike, send a template message carousel
     if isCelebrity and gender is not None:
         app.logger.info('[MATCH FOUND]')
-        return createMessageTemplate(sorted_list, 2, sender_image_id, gender, age)
+        return createMessageTemplate(sorted_list, gender, age, 2, sender_image_id)
     # 2 a celebrity lookalike but not a person
     elif isCelebrity:
         app.logger.info('[CELEB ONLY]')
