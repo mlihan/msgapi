@@ -273,16 +273,17 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
         temp = CarouselColumn(
             thumbnail_image_url=celeb['image_url'],
             title=title[:39],
-            text='Age:' + str(age) + ' Score: ' + score + '%',
+            text='Score: ' + score + '%',
             actions=[
                 PostbackTemplateAction(
                     label='Agree 同意',
                     text='Agree',
                     data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
                 ),                
-                MessageTemplateAction(
+                PostbackTemplateAction(
                     label='Disagree 不同意',
-                    text='Disagree.'
+                    text='Disagree.',
+                    data='action=disagree'
                 )
             ]
         )
