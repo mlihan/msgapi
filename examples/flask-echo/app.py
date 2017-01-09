@@ -277,13 +277,12 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
             actions=[
                 PostbackTemplateAction(
                     label=u'Agree 同意',
-                    text='Agree',
+                    text=u'Agree 同意',
                     data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
-                ),    
-                PostbackTemplateAction(
+                ),                
+                MessageTemplateAction(
                     label=u'Disagree 不同意',
-                    text='Disagree.', 
-                    data='action=disagree&sortedList=' + str(sorted_list) + '&age=' + str(age)
+                    text='Disagree.' 
                 )
             ]
         )
