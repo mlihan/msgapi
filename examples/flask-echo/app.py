@@ -273,33 +273,40 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
         temp = CarouselColumn(
             thumbnail_image_url=celeb['image_url'],
             title=title[:39],
-            text=' Score: ' + score + '%',
+            text='Age:' + str(age) + ' Score: ' + score + '%',
             actions=[
                 PostbackTemplateAction(
                     label='Agree, check results 同意，看結果',
                     text= 'Agree 同意',
-                    data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score)
+                    data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
                 ),
                 MessageTemplateAction(
                     label='Disagree 不同意',
                     text='Disagree.' 
+                ),
+                URITemplateAction(
+                    label='Share to friends 分享好友',
+                    uri='line://nv/recommendOA/@' + oa_id
                 )
+             
             ]
         )
-        if index % 2 == 0:
-            temp.actions.append(
-                URITemplateAction(
-                        label='Share to friends 分享好友',
-                        uri='line://nv/recommendOA/@' + oa_id
-                    )
-                )
-        else:
-            temp.actions.append(
-                URITemplateAction(
-                        label='Add me as a friend 加我好友',
-                        uri='line://oaMessage/@' + oa_id +'/hello'
-                    )
-                )
+        # if index % 2 == 0:
+        #     app.logger.debug('asdf1')
+        #     temp.actions.append(
+        #         URITemplateAction(
+        #                 label='Share to friends 分享好友',
+        #                 uri='line://nv/recommendOA/@' + oa_id
+        #             )
+        #         )
+        # else:
+        #     app.logger.debug('asdf2')
+        #     temp.actions.append(
+        #         URITemplateAction(
+        #                 label='Add me as a friend 加我好友',
+        #                 uri='line://oaMessage/@' + oa_id +'/hello'
+        #             )
+        #         )
         columns.append(temp)
 
     carousel_template_message = TemplateSendMessage(
