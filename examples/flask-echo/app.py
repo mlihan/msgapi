@@ -114,14 +114,13 @@ def callback():
 
             # Check if no classifier found, send a text message
             if classifiers == 0:
-                sendMessage = TextSendMessage(text='I\'m sorry but your image is out of this world. Please try another image.')
+                sendMessage = TextSendMessage(text='I\'m sorry, under maintainance. Please inform you-know-who if you see this message.')
             else:
                 sendMessage = getMessageForClassifier(classifiers, sender_image_id)            
         else:
             continue
 
         line_bot_api.reply_message(event.reply_token, sendMessage)
-
     return 'OK'
 
 # analyze postback action
@@ -210,9 +209,16 @@ def hasFaceFromImageMessage(image_url):
     # check if a classifier is detected in the image
     if 'gender' in json.dumps(response):
         first_face = response['images'][0]['faces'][0]
-        gender = first_face['gender']['gender']
-        age = first_face['age']['max'] - 5
-        return gender.lower(), age
+        gender = first_face['gender']['gender'].lower()
+        age = 18
+        try: 
+            if gender == 'female':
+                age = first_face['age']['min']
+            else:
+                age = first_face['age']['max'] 
+        except:
+            age = first_face['age']['max']
+        return gender, age
     else:
         return None, None
 
