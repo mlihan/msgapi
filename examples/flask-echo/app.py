@@ -143,10 +143,14 @@ def analyzePostbackEvent(event):
                 sendMessage = getMessageForClassifier(classifiers, image_id)            
         else:
             sendMessage = TextSendMessage(text='Please send me a picture of yourself.')
-
     elif 'action=agree' in data:
         sendMessage = []
         sendMessage.append(createImageMessage(data))
+        if event.source.type == 'group':
+            sendMessage.append(createConfirmMessage())
+    elif 'action=disagree' in data:
+        sendMessage = []
+        sendMessage.append(createRedCarpet(data))
         if event.source.type == 'group':
             sendMessage.append(createConfirmMessage())
     return sendMessage
@@ -172,7 +176,7 @@ def saveContentImage(event):
 def classifyImageMessage(image_url):
     #initialize v3/classify
     threshold = config.get('DEFAULT', 'Bluemix_Threshold')
-    
+    response = None
     #call v3/classify
     try: 
         response = visual_recognition.classify(
@@ -181,7 +185,7 @@ def classifyImageMessage(image_url):
         threshold=threshold
         )
     except:
-        app.logger.error('Unexpected errer' + response.text)
+        app.logger.error('Unexpected errer please check limit.' + json.dumps(response))
         return 0
     app.logger.debug(json.dumps(response, indent=2))
 
@@ -199,7 +203,7 @@ def hasFaceFromImageMessage(image_url):
         images_url=image_url
         )
     except:
-        app.logger.error('Unexpected error:' + json.dumps(response))
+        app.logger.error('Unexpected error please check limit.' + json.dumps(response))
         return 0
     app.logger.debug('detect_faces' + json.dumps(response, indent=2))
 
@@ -208,7 +212,7 @@ def hasFaceFromImageMessage(image_url):
         first_face = response['images'][0]['faces'][0]
         gender = first_face['gender']['gender']
         age = first_face['age']['max'] - 5
-        return gender, age
+        return gender.lower(), age
     else:
         return None, None
 
@@ -231,7 +235,7 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
         app.logger.info('[CELEB ONLY]')
         type_class = classifiers[1]['classes'][0]['class']
         celeb = celeb_db.findRecordWithId(classifiers[0]['classes'][0]['class'])
-        return TextSendMessage(text='It looks more like a {0} to me'.format(type_class))
+        return TextSendMessage(text='It looks more like a {0} to me. Please send a selfie to get better results.'.format(type_class))
     # TODO: 3 a person, call detect_face send a single template message, 
     elif isPerson:
         app.logger.info('[PERSON ONLY]')
@@ -256,7 +260,7 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
         celeb = celeb_db.findRecordWithId(celeb_class['class'])
 
         # skip celeb with different gender
-        if gender.lower() != celeb['sex']:
+        if gender != celeb['sex']:
             app.logger.debug('Skipping {0} because user gender is {1}'.format(celeb['en_name'], gender))
             max_index = max_index + 1 
             continue
@@ -279,9 +283,10 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
                     text='Agree',
                     data='action=agree&celebImg=' + str(celeb['image_id']) + '&senderImg=' + str(sender_image_id) + '&score=' + str(score) + '&age=' + str(age)
                 ),
-                MessageTemplateAction(
+                PostbackTemplateAction(
                     label='Disagree 不同意',
-                    text='Disagree.'
+                    text='Disagree',
+                    data='action=disagree&senderImg=' + str(sender_image_id) + '&gender=' + gender + '&age=' + str(age)
                 )
             ]
         )
@@ -347,15 +352,15 @@ def createImageMessage(data):
     url = 'https://res.cloudinary.com/' \
         '{0}/image/upload/c_fill,g_face:center,l_' \
         '{1},w_225,h_400,x_-128,y_-20/c_fill,g_face:center,l_' \
-        '{2},w_256,h_400,x_128,y_-20/c_scale,g_south,h_100,l_logo_w_name/l_text:Verdana_35_bold:Score%20' \
-        '{3}%20Age:%20{4},co_rgb:990C47,y_155,g_north,y_10/result.jpg' \
-        .format(cloudinary_cloud, celeb_img_id, sender_img_id, score, age)
+        '{2},w_256,h_400,x_128,y_-20/c_scale,g_south,h_100,l_logo_w_name/l_text:Verdana_35_bold:Your%20Age:%20' \
+        '{3},co_rgb:990C47,y_155,g_north,y_10/result.jpg' \
+        .format(cloudinary_cloud, celeb_img_id, sender_img_id, age)
 
-    app.logger.debug('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score + ' url:' + url)    
+    app.logger.debug('celeb_img_id:' + str(celeb_img_id) + ' sender_img_id:' + sender_img_id + ' score:' + score + ' url:' + url)
     template = ImageSendMessage(
-                original_content_url=url,
-                preview_image_url=url
-                )
+        original_content_url=url,
+        preview_image_url=url
+    )
     return template
 
     # url = 'https://ucarecdn.com/85b5644f-e692-4855-9db0-8c5a83096e25/-/resize'
@@ -381,6 +386,26 @@ def createImageMessage(data):
 
     # return imagemap_message
 
+def createRedCarpet(data):
+    # get data
+    sender_img_id = data.split('&')[1].split('=')[1]
+    gender = data.split('&')[2].split('=')[1]
+    age = data.split('&')[3].split('=')[1]
+    url = ''
+    # setup url based on gender
+    if gender == 'female':
+        url = 'http://res.cloudinary.com/{0}/image/upload/c_thumb,' \
+        'g_face:center,h_100,r_max,w_70/u_bradgelina,x_-20,y_290/v1484046371/' \
+        '{1}.jpg'.format(cloudinary_cloud, sender_img_id)
+    else:
+        url = 'http://res.cloudinary.com/dmshmeaoc/image/upload/c_thumb,' \
+        'g_face:center,h_90,r_max,w_60/a_-10/u_bradgelina,x_110,y_310/v1484046371/' \
+        '{0}.jpg'.format(sender_img_id)
+    template = ImageSendMessage(
+        original_content_url=url,
+        preview_image_url=url
+    )
+    return template
 # compute look alike score of a celebrity
 def computeScore(json_score, index):
     magic_num = index * 5
