@@ -186,6 +186,7 @@ def classifyImageMessage(image_url):
         )
     except:
         app.logger.error('Unexpected errer please check limit.' + json.dumps(response))
+        global bluemix_index
         bluemix_index = (((bluemix_index + 1) % 4) + 1)
         updateBluemixKey(bluemix_index)
         return 0
@@ -238,6 +239,7 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
     # 1 a person and celebrity look alike, send a template message carousel
     if isCelebrity and gender is not None:
         app.logger.info('[MATCH FOUND]')
+        global bluemix_index
         bluemix_index = (((bluemix_index + 1) % 4) + 1)
         updateBluemixKey(bluemix_index)
         return createMessageTemplate(sorted_list, gender, age, 3, sender_image_id)
