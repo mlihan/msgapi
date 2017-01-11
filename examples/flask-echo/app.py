@@ -187,8 +187,8 @@ def classifyImageMessage(image_url):
     except:
         app.logger.error('Unexpected errer please check limit.' + json.dumps(response))
         global bluemix_index
-        bluemix_index = (((bluemix_index + 1) % 4) + 1)
-        updateBluemixKey(bluemix_index)
+        bluemix_index = ((bluemix_index + 1) % 4)
+        updateBluemixKey(bluemix_index+1)
         return 0
     app.logger.debug(json.dumps(response, indent=2))
 
@@ -207,6 +207,9 @@ def hasFaceFromImageMessage(image_url):
         )
     except:
         app.logger.error('Unexpected error please check limit.' + json.dumps(response))
+        global bluemix_index
+        bluemix_index = ((bluemix_index + 1) % 4)
+        updateBluemixKey(bluemix_index+1)
         return 0
     app.logger.debug('detect_faces' + json.dumps(response, indent=2))
 
@@ -240,8 +243,8 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
     if isCelebrity and gender is not None:
         app.logger.info('[MATCH FOUND]')
         global bluemix_index
-        bluemix_index = (((bluemix_index + 1) % 4) + 1)
-        updateBluemixKey(bluemix_index)
+        bluemix_index = ((bluemix_index + 1) % 4)
+        updateBluemixKey(bluemix_index+1)
         return createMessageTemplate(sorted_list, gender, age, 3, sender_image_id)
     # 2 a celebrity lookalike but not a person
     elif isCelebrity:
