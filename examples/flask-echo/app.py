@@ -65,7 +65,7 @@ if oa_id is None:
 if bluemix_classifier is None:
     print('Specify BLUEMIX_CLASSIFIER as environment variable')
     sys.exit(1)
-if bluemix_cloud is None:
+if cloudinary_cloud is None:
     print('Specify CLOUDINARY_CLOUD as environment variable')
     sys.exit(1)
 
