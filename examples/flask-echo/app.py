@@ -45,10 +45,9 @@ app = Flask(__name__)
 # get channel_secret and channel_access_token from your environment variable
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
-bluemix_api_key = os.getenv('BLUEMIX_API_KEY', None)
 oa_id = os.getenv('OA_ID', None)
-bluemix_classifier = os.getenv('BLUEMIX_CLASSIFIER', None)
 cloudinary_cloud = os.getenv('CLOUDINARY_CLOUD', None)
+updateBluemixKey(1)
 
 if channel_secret is None:
     print('Specify LINE_CHANNEL_SECRET as environment variable.')
@@ -65,7 +64,7 @@ if oa_id is None:
 if bluemix_classifier is None:
     print('Specify BLUEMIX_CLASSIFIER as environment variable')
     sys.exit(1)
-if bluemix_classifier is None:
+if bluemix_cloud is None:
     print('Specify CLOUDINARY_CLOUD as environment variable')
     sys.exit(1)
 
@@ -75,6 +74,7 @@ parser = WebhookParser(channel_secret)
 config = configparser.ConfigParser()
 config.read('locale.ini')
 language = config.get('DEFAULT', 'language')
+bluemix_index = 1
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -185,6 +185,7 @@ def classifyImageMessage(image_url):
         )
     except:
         app.logger.error('Unexpected errer please check limit.' + json.dumps(response))
+        updateBluemixKey(((bluemix_index + 1) % 4) + 1)
         return 0
     app.logger.debug(json.dumps(response, indent=2))
 
@@ -235,6 +236,7 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
     # 1 a person and celebrity look alike, send a template message carousel
     if isCelebrity and gender is not None:
         app.logger.info('[MATCH FOUND]')
+        updateBluemix(((bluemix_index + 1) % 4) + 1)
         return createMessageTemplate(sorted_list, gender, age, 3, sender_image_id)
     # 2 a celebrity lookalike but not a person
     elif isCelebrity:
@@ -419,6 +421,14 @@ def computeScore(json_score, index):
     if score >= 100:
         score = 99
     return str(round(score, 0))
+
+# change env config for bluemix 
+def updateBluemixKey(index):
+    app.logger.info('BLUEMIX API update to ' + index)
+    classifier = 'BLUEMIX_CLASSIFIER_' + str(index)
+    bluemix_classifiers = os.getenv(classifier, None)
+    api_key = 'BLUEMIX_API_KEY_' + str(index)
+    bluemix_api_key = os.getenv('BLUEMIX_API_KEY', None)
 
 # get picture url of a profile
 def getProfilePictureUrl(user_id):

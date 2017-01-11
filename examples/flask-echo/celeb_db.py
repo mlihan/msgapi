@@ -26,3 +26,9 @@ def findRecordWithId(celeb_id):
 
 def findRecordWithName(en_name):
     return celeb_collection.find_one({'en_name': name})
+
+def updateImageWithId(celeb_id, image_url, image_id):
+    return celeb_collection.update_one(
+        {'celeb_id':int(celeb_id)}, 
+        {'$set': {'image_url': image_url, 'image_id': image_id}}
+    )
