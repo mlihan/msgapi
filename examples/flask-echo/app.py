@@ -46,8 +46,9 @@ app = Flask(__name__)
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
 oa_id = os.getenv('OA_ID', None)
+bluemix_api_key = os.getenv('BLUEMIX_API_KEY_1', None)
+bluemix_classifier = os.getenv('BLUEMIX_CLASSIFIER_1', None)
 cloudinary_cloud = os.getenv('CLOUDINARY_CLOUD', None)
-updateBluemixKey(1)
 
 if channel_secret is None:
     print('Specify LINE_CHANNEL_SECRET as environment variable.')
