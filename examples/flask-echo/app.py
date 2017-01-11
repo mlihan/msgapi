@@ -186,7 +186,8 @@ def classifyImageMessage(image_url):
         )
     except:
         app.logger.error('Unexpected errer please check limit.' + json.dumps(response))
-        updateBluemixKey(((bluemix_index + 1) % 4) + 1)
+        bluemix_index = (((bluemix_index + 1) % 4) + 1)
+        updateBluemixKey(bluemix_index)
         return 0
     app.logger.debug(json.dumps(response, indent=2))
 
