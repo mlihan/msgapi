@@ -425,7 +425,7 @@ def computeScore(json_score, index):
 
 # change env config for bluemix 
 def updateBluemixKey(index):
-    app.logger.info('BLUEMIX API update to ' + index)
+    app.logger.info('BLUEMIX API update to ' + str(index))
     classifier = 'BLUEMIX_CLASSIFIER_' + str(index)
     bluemix_classifiers = os.getenv(classifier, None)
     api_key = 'BLUEMIX_API_KEY_' + str(index)
