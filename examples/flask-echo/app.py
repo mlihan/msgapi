@@ -302,23 +302,13 @@ def createMessageTemplate(sorted_list, gender, age, max_index=2, sender_image_id
                     label='Disagree 不同意',
                     text='Disagree',
                     data='action=disagree&senderImg=' + str(sender_image_id) + '&gender=' + gender + '&age=' + str(age)
-                )
+                ),
+                URITemplateAction(
+                    label='Try it now!',
+                    uri='line://oaMessage/@' + oa_id +'/add_me'
+                )    
             ]
         )
-        if index % 2 == 0:
-            temp.actions.append(
-                URITemplateAction(
-                        label='Share to friends',
-                        uri='line://nv/recommendOA/@' + oa_id
-                    )
-                )
-        else:
-            temp.actions.append(
-                URITemplateAction(
-                        label='Add me as a friend',
-                        uri='line://oaMessage/@' + oa_id +'/hello'
-                    )
-                )
         columns.append(temp)
 
     carousel_template_message = TemplateSendMessage(
@@ -344,11 +334,15 @@ def createConfirmMessage(user_id=None):
         template=ConfirmTemplate(
             text='Do you want to know which celebrity you look like? 想知道您的LINE大頭照像那位明星嗎？',
             actions=[
-                PostbackTemplateAction(
-                    label='Yes! 想！',
-                    text='Yes!',
-                    data=data
+                URITemplateAction(
+                    label='Yes!',
+                    uri='line://oaMessage/@' + oa_id +'/add_me'
                 ),
+                # PostbackTemplateAction(
+                #     label='Yes! 想！',
+                #     text='Yes!',
+                #     data=data
+                # ),
                 MessageTemplateAction(
                     label='About Me',
                     text='I\'m a bot that searches for a celebrities who look like you. Try and send me a picture! 你有明星臉嗎？快上傳自拍照，狗仔隊馬上為你揭曉！'
