@@ -118,6 +118,8 @@ def callback():
                 sendMessage = TextSendMessage(text='I\'m sorry, under maintainance. Please inform you-know-who if you see this message.')
             else:
                 sendMessage = getMessageForClassifier(classifiers, sender_image_id)            
+        elif isinstance(event, MessageEvent)
+            sendMessage = TextSendMessage(text='Hello. I\'m a bot that searches for a celebrities who look like you. Try and send me a picture! 你有明星臉嗎？快上傳自拍照，狗仔隊馬上為你揭曉！')
         else:
             continue
 
@@ -242,9 +244,6 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
     # 1 a person and celebrity look alike, send a template message carousel
     if isCelebrity and gender is not None:
         app.logger.info('[MATCH FOUND]')
-        global bluemix_index
-        bluemix_index = ((bluemix_index + 1) % 4)
-        updateBluemixKey(bluemix_index+1)
         return createMessageTemplate(sorted_list, gender, age, 3, sender_image_id)
     # 2 a celebrity lookalike but not a person
     elif isCelebrity:
