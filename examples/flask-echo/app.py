@@ -57,13 +57,13 @@ if channel_access_token is None:
     print('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
     sys.exit(1)
 if bluemix_api_key is None:
-    print('Specify BLUEMIX_API_KEY as environment variable.')
+    print('Specify BLUEMIX_API_KEY_1 as environment variable.')
     sys.exit(1)
 if oa_id is None:
     print('Specify OA_ID as environment variable')
     sys.exit(1)
 if bluemix_classifier is None:
-    print('Specify BLUEMIX_CLASSIFIER as environment variable')
+    print('Specify BLUEMIX_CLASSIFIER_1 as environment variable')
     sys.exit(1)
 if cloudinary_cloud is None:
     print('Specify CLOUDINARY_CLOUD as environment variable')
@@ -183,6 +183,7 @@ def classifyImageMessage(image_url):
     threshold = config.get('DEFAULT', 'Bluemix_Threshold')
     response = None
     #call v3/classify
+    app.logger.debug('BLUEMIX classifier:' + bluemix_classifier)
     try: 
         response = visual_recognition.classify(
         images_url=image_url,
@@ -414,9 +415,10 @@ def computeScore(json_score, index):
 def updateBluemixKey(index):
     app.logger.info('BLUEMIX API update to ' + str(index))
     classifier = 'BLUEMIX_CLASSIFIER_' + str(index)
-    bluemix_classifiers = os.getenv(classifier, None)
+    bluemix_classifier = os.getenv(classifier, None)
     api_key = 'BLUEMIX_API_KEY_' + str(index)
     bluemix_api_key = os.getenv(api_key, None)
+    visual_recognition = VisualRecognitionV3('2016-05-20', api_key=bluemix_api_key)
 
 # get picture url of a profile
 def getProfilePictureUrl(user_id):
