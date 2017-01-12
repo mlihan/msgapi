@@ -414,7 +414,6 @@ def computeScore(json_score, index):
 
 # change env config for bluemix 
 def updateBluemixKey(index):
-    app.logger.info('[BLUEMIX] Update API index to {0}'.format(str(index)))
     # Set config name based on index
     classifier = 'BLUEMIX_CLASSIFIER_' + str(index)
     api_key = 'BLUEMIX_API_KEY_' + str(index)
@@ -425,7 +424,7 @@ def updateBluemixKey(index):
 
     bluemix_classifier = os.getenv(classifier, None)
     bluemix_api_key = os.getenv(api_key, None)
-    app.logger.info('[BLUEMIX] Update index {0} and classifier {1}'.format(str(index), classifiers))
+    app.logger.info('[BLUEMIX] Update index {0} and classifier {1}'.format(str(index), classifier))
     visual_recognition = VisualRecognitionV3('2016-05-20', api_key=bluemix_api_key)
 
 # get picture url of a profile
