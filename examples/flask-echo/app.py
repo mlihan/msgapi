@@ -239,11 +239,10 @@ def hasFaceFromImageMessage(image_url):
 def getMessageForClassifier(classifiers, sender_image_id=None):
     isCelebrity = len(classifiers) > 1
     sorted_list = sorted(classifiers[0]['classes'], key=lambda k:(-float(k['score'])))
-    max_confidence = sorted_list[0]['score']
     image_url = 'https://res.cloudinary.com/{0}/image/upload/{1}.jpg'.format(cloudinary_cloud, sender_image_id)
     gender, age = hasFaceFromImageMessage(image_url)
     
-    app.logger.debug('isCelebrity: {0} max_confidence: {1} gender: {2} age: {3}'.format(str(isCelebrity), str(max_confidence), str(gender), str(age)))
+    app.logger.debug('isCelebrity: {0} gender: {1} age: {2}'.format(str(isCelebrity), str(gender), str(age)))
 
     # 1 a person and celebrity look alike, send a template message carousel
     if isCelebrity and gender is not None:
