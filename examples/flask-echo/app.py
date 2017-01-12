@@ -182,6 +182,7 @@ def classifyImageMessage(image_url):
     #initialize v3/classify
     threshold = config.get('DEFAULT', 'Bluemix_Threshold')
     response = None
+    app.debug("{0} blue mix classifier").format('bluemix_classifier')
     #call v3/classify
     app.logger.debug('BLUEMIX classifier:' + bluemix_classifier)
     try: 
@@ -413,13 +414,18 @@ def computeScore(json_score, index):
 
 # change env config for bluemix 
 def updateBluemixKey(index):
+    app.logger.info('[BLUEMIX] Update API index to {0}'.format(str(index)))
+    # Set config name based on index
+    classifier = 'BLUEMIX_CLASSIFIER_' + str(index)
+    api_key = 'BLUEMIX_API_KEY_' + str(index)
+
+    # update global variables 
     global bluemix_classifier
     global bluemix_api_key
-    classifier = 'BLUEMIX_CLASSIFIER_' + str(index)
+
     bluemix_classifier = os.getenv(classifier, None)
-    api_key = 'BLUEMIX_API_KEY_' + str(index)
     bluemix_api_key = os.getenv(api_key, None)
-    app.logger.debug('BLUEMIX API update to {0}, classifier {1}, api {2}'.format(str(index), bluemix_classifier, bluemix_api_key))
+    app.logger.info('[BLUEMIX] Update index {0} and classifier {1}'.format(str(index), classifiers))
     visual_recognition = VisualRecognitionV3('2016-05-20', api_key=bluemix_api_key)
 
 # get picture url of a profile
