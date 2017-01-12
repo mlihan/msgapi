@@ -182,7 +182,6 @@ def classifyImageMessage(image_url):
     #initialize v3/classify
     threshold = config.get('DEFAULT', 'Bluemix_Threshold')
     response = None
-    app.debug("{0} blue mix classifier").format('bluemix_classifier')
     #call v3/classify
     app.logger.debug('BLUEMIX classifier:' + bluemix_classifier)
     try: 
