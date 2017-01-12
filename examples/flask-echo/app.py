@@ -118,8 +118,8 @@ def callback():
                 sendMessage = TextSendMessage(text='I\'m sorry, under maintainance. Please inform you-know-who if you see this message.')
             else:
                 sendMessage = getMessageForClassifier(classifiers, sender_image_id)            
-        elif isinstance(event, MessageEvent):
-            sendMessage = TextSendMessage(text='Hello. I\'m a bot that searches for a celebrities who look like you. Try and send me a picture! 你有明星臉嗎？快上傳自拍照，狗仔隊馬上為你揭曉！')
+        #elif isinstance(event, MessageEvent):
+        #    sendMessage = TextSendMessage(text='Hello. I\'m a bot that searches for a celebrities who look like you. Try and send me a picture! 你有明星臉嗎？快上傳自拍照，狗仔隊馬上為你揭曉！')
         else:
             continue
 
