@@ -252,7 +252,7 @@ def getMessageForClassifier(classifiers, sender_image_id=None):
         celeb = celeb_db.findRecordWithId(classifiers[0]['classes'][0]['class'])
         return TextSendMessage(text='It looks more like a {0} to me. Please send a selfie to get better results.'.format(type_class))
     # TODO: 3 a person, call detect_face send a single template message, 
-    elif isPerson:
+    elif gender is not None:
         app.logger.info('[PERSON ONLY]')
         type_class = classifiers[0]['classes'][0]['class']
         return TextSendMessage(text='You don\'t look like any celebrities, but you look like a {0}. Please try another image.'.format(type_class))
