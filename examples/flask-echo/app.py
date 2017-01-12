@@ -395,6 +395,8 @@ def createRedCarpet(data):
         'g_face,r_max,w_130/u_wang2,x_50,y_180/v1484046371/' \
         '{1}.jpg'.format(cloudinary_cloud, sender_img_id)
         ]
+        i = randint(0,1)
+        url = str(male_url[i])
 
     template = ImageSendMessage(
         original_content_url=url,
