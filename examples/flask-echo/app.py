@@ -324,30 +324,29 @@ def createWelcomeMessage():
 
 # create a confirm message
 def createConfirmMessage(user_id=None):
-    # if has user id
+
+    # Initialize variables
     data = 'action=tryme'
+    actions = [MessageTemplateAction(
+        label='About Me',
+        text='I\'m a bot that searches for a celebrities who look like you. Try and send me a picture! 你有明星臉嗎？快上傳自拍照，狗仔隊馬上為你揭曉！'
+    )]
+
+    # Only one to one chat has user_id
     if user_id is not None:
         data = data + '&user_id=' + user_id
+        actions.insert(0, PostbackTemplateAction(
+            label='Yes! 想！', text='Yes!', data=data))
+    else:
+        actions.insert(0, URITemplateAction(
+            label='Yes! 想！', uri='line://oaMessage/@' + oa_id +'/add_me'))
 
+    # Create template message
     confirm_template_message = TemplateSendMessage(
         alt_text='Please check message on your smartphone',
         template=ConfirmTemplate(
             text='Do you want to know which celebrity you look like? 想知道您的LINE大頭照像那位明星嗎？',
-            actions=[
-                URITemplateAction(
-                    label='Yes!',
-                    uri='line://oaMessage/@' + oa_id +'/add_me'
-                ),
-                # PostbackTemplateAction(
-                #     label='Yes! 想！',
-                #     text='Yes!',
-                #     data=data
-                # ),
-                MessageTemplateAction(
-                    label='About Me',
-                    text='I\'m a bot that searches for a celebrities who look like you. Try and send me a picture! 你有明星臉嗎？快上傳自拍照，狗仔隊馬上為你揭曉！'
-                )
-            ]
+            actions=actions
         )
     )
     return confirm_template_message
