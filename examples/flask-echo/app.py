@@ -46,8 +46,6 @@ app = Flask(__name__)
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
 oa_id = os.getenv('OA_ID', None)
-bluemix_api_key = os.getenv('BLUEMIX_API_KEY_2', None)
-bluemix_classifier = os.getenv('BLUEMIX_CLASSIFIER_2', None)
 cloudinary_cloud = os.getenv('CLOUDINARY_CLOUD', None)
 
 if channel_secret is None:
@@ -56,26 +54,32 @@ if channel_secret is None:
 if channel_access_token is None:
     print('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
     sys.exit(1)
-if bluemix_api_key is None:
-    print('Specify BLUEMIX_API_KEY_1 as environment variable.')
-    sys.exit(1)
 if oa_id is None:
     print('Specify OA_ID as environment variable')
-    sys.exit(1)
-if bluemix_classifier is None:
-    print('Specify BLUEMIX_CLASSIFIER_1 as environment variable')
     sys.exit(1)
 if cloudinary_cloud is None:
     print('Specify CLOUDINARY_CLOUD as environment variable')
     sys.exit(1)
 
-visual_recognition = VisualRecognitionV3('2016-05-20', api_key=bluemix_api_key)
+
+bluemix_api_keys = [os.getenv('BLUEMIX_API_KEY_1', None),
+    os.getenv('BLUEMIX_API_KEY_2', None),
+    os.getenv('BLUEMIX_API_KEY_3', None),
+    os.getenv('BLUEMIX_API_KEY_4', None)]
+bluemix_classifiers = [os.getenv('BLUEMIX_CLASSIFIER_1', None),
+    os.getenv('BLUEMIX_CLASSIFIER_2', None),
+    os.getenv('BLUEMIX_CLASSIFIER_3', None),
+    os.getenv('BLUEMIX_CLASSIFIER_4', None)]
+visual_recognitions = [VisualRecognitionV3('2016-05-20', api_key=str(bluemix_api_keys[0])),
+    VisualRecognitionV3('2016-05-20', api_key=str(bluemix_api_keys[1])),
+    VisualRecognitionV3('2016-05-20', api_key=str(bluemix_api_keys[2])),
+    VisualRecognitionV3('2016-05-20', api_key=str(bluemix_api_keys[3]))]
+bluemix_index = 1
 line_bot_api = LineBotApi(channel_access_token)
 parser = WebhookParser(channel_secret)
 config = configparser.ConfigParser()
 config.read('locale.ini')
 language = config.get('DEFAULT', 'language')
-bluemix_index = 1
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -140,7 +144,7 @@ def analyzePostbackEvent(event):
 
             # Check if no classifier found, send a text message
             if classifiers == 0:
-                sendMessage = TextSendMessage(text='I\'m sorry but your image is out of this world. Please try another image.')
+                sendMessage = TextSendMessage(text='I\'m sorry but your image is out of this world. Please try another image or I\'m under maintenance')
             else:
                 sendMessage = getMessageForClassifier(classifiers, image_id)            
         else:
@@ -177,21 +181,20 @@ def saveContentImage(event):
 # Classify image in Bluemix
 def classifyImageMessage(image_url):
     #initialize v3/classify
+    global bluemix_index
     threshold = config.get('DEFAULT', 'Bluemix_Threshold')
     response = None
     #call v3/classify
-    app.logger.debug('BLUEMIX classifier:' + bluemix_classifier)
     try: 
-        response = visual_recognition.classify(
+        response = visual_recognitions[bluemix_index].classify(
             images_url=image_url,
-            classifier_ids=[bluemix_classifier, 'default'], 
+            classifier_ids=[bluemix_classifiers[bluemix_index], 'default'], 
             threshold=threshold
         )
     except:
-        app.logger.error('Bluemix unexpected error please check limit.' + json.dumps(response))
-        global bluemix_index
-        bluemix_index = ((bluemix_index + 1) % 4)
-        updateBluemixKey(bluemix_index+1)
+        app.logger.error('Bluemix unexpected error please check limit.')
+        # round robin
+        bluemix_index = (bluemix_index + 1) % len(bluemix_classifiers)
         return 0
     app.logger.debug(json.dumps(response))
 
@@ -204,13 +207,13 @@ def classifyImageMessage(image_url):
 # Classify image in Bluemix
 def hasFaceFromImageMessage(image_url):
     #call v3/detect_faces
+    global bluemix_index
     try: 
-        response = visual_recognition.detect_faces(
-        images_url=image_url
+        response = visual_recognitions[bluemix_index].detect_faces(
+            images_url=image_url
         )
     except:
         app.logger.error('Unexpected error please check limit.' + json.dumps(response))
-        global bluemix_index
         bluemix_index = ((bluemix_index + 1) % 4)
         updateBluemixKey(bluemix_index+1)
         return 0
@@ -406,21 +409,6 @@ def computeScore(json_score, index):
     if score >= 100:
         score = 99
     return str(round(score, 0))
-
-# change env config for bluemix 
-def updateBluemixKey(index):
-    # Set config name based on index
-    classifier = 'BLUEMIX_CLASSIFIER_' + str(index)
-    api_key = 'BLUEMIX_API_KEY_' + str(index)
-
-    # update global variables 
-    global bluemix_classifier
-    global bluemix_api_key
-
-    bluemix_classifier = os.getenv(classifier, None)
-    bluemix_api_key = os.getenv(api_key, None)
-    app.logger.info('[BLUEMIX] Update index {0} and classifier {1}'.format(bluemix_api_key, bluemix_classifier))
-    visual_recognition = VisualRecognitionV3('2016-05-20', api_key=bluemix_api_key)
 
 # get picture url of a profile
 def getProfilePictureUrl(user_id):
