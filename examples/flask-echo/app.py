@@ -131,6 +131,9 @@ def analyzePostbackEvent(event):
     data = str(event.postback.data)
     if 'action=tryme' in data:
         sendMessage = None
+        global bluemix_index
+        bluemix_index = ((bluemix_index + 1) % 4)
+        updateBluemixKey(bluemix_index+1)
         if 'user_id' in data:
             # Use profile picture of user to classify
             user_id = data.split('&')[1].split('=')[1]
@@ -324,7 +327,6 @@ def createWelcomeMessage():
 
 # create a confirm message
 def createConfirmMessage(user_id=None):
-
     # Initialize variables
     data = 'action=tryme'
     actions = [MessageTemplateAction(
@@ -337,6 +339,8 @@ def createConfirmMessage(user_id=None):
         data = data + '&user_id=' + user_id
         actions.insert(0, PostbackTemplateAction(
             label='Yes! 想！', text='Yes!', data=data))
+
+    # In group chat, send user directly to OA
     else:
         actions.insert(0, URITemplateAction(
             label='Yes! 想！', uri='line://oaMessage/@' + oa_id +'/add_me'))
@@ -371,29 +375,6 @@ def createImageMessage(data):
     )
     return template
 
-    # url = 'https://ucarecdn.com/85b5644f-e692-4855-9db0-8c5a83096e25/-/resize'
-    # imagemap_message = ImagemapSendMessage(
-    #    base_url=url,
-    #    alt_text='Please check your smartphone',
-    #    base_size=BaseSize(height=1040, width=1040),
-    #    actions=[
-    #        URIImagemapAction(
-    #            link_uri='https://example.com/',
-    #            area=ImagemapArea(
-    #                x=0, y=0, width=520, height=1040
-    #            )
-    #        ),
-    #        MessageImagemapAction(
-    #            text='hello',
-    #            area=ImagemapArea(
-    #                x=520, y=0, width=520, height=1040
-    #             )
-    #         )
-    #     ]
-    # )
-
-    # return imagemap_message
-
 def createRedCarpet(data):
     # get data
     sender_img_id = data.split('&')[1].split('=')[1]
@@ -414,6 +395,7 @@ def createRedCarpet(data):
         preview_image_url=url
     )
     return template
+
 # compute look alike score of a celebrity
 def computeScore(json_score, index):
     magic_num = index * 5
@@ -428,7 +410,7 @@ def updateBluemixKey(index):
     classifier = 'BLUEMIX_CLASSIFIER_' + str(index)
     bluemix_classifiers = os.getenv(classifier, None)
     api_key = 'BLUEMIX_API_KEY_' + str(index)
-    bluemix_api_key = os.getenv('BLUEMIX_API_KEY', None)
+    bluemix_api_key = os.getenv(api_key, None)
 
 # get picture url of a profile
 def getProfilePictureUrl(user_id):
