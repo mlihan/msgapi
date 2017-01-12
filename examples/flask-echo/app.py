@@ -187,7 +187,6 @@ def classifyImageMessage(image_url):
             classifier_ids=[bluemix_classifier, 'default'], 
             threshold=threshold
         )
-        if response['images'][0]['classifiers']['']
     except:
         app.logger.error('Bluemix unexpected error please check limit.' + json.dumps(response))
         global bluemix_index
