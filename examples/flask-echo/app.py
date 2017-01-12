@@ -174,7 +174,7 @@ def saveContentImage(event):
         image_url, image_id = image_management.upload('temp_img', 'user_image')
         return image_url, image_id
     except:
-        app.logger.error('Unexpected error:' + response.text)
+        app.logger.error('Image upload unexpected error:' + response.text)
         return 'NG'
 
 # Classify image in Bluemix
@@ -190,12 +190,12 @@ def classifyImageMessage(image_url):
         threshold=threshold
         )
     except:
-        app.logger.error('Unexpected errer please check limit.' + json.dumps(response))
+        app.logger.error('Bluemix unexpected error please check limit.' + json.dumps(response))
         global bluemix_index
         bluemix_index = ((bluemix_index + 1) % 4)
         updateBluemixKey(bluemix_index+1)
         return 0
-    app.logger.debug(json.dumps(response, indent=2))
+    app.logger.debug(json.dumps(response))
 
     # check if a classifier is detected in the image
     if 'classifiers' in json.dumps(response):
@@ -381,15 +381,21 @@ def createRedCarpet(data):
     gender = data.split('&')[2].split('=')[1]
     age = data.split('&')[3].split('=')[1]
     url = ''
+    male_url = []
     # setup url based on gender
     if gender == 'female':
         url = 'https://res.cloudinary.com/{0}/image/upload/c_thumb,' \
         'g_face:center,h_100,r_max,w_70/u_bradgelina,x_-20,y_290/v1484046371/' \
         '{1}.jpg'.format(cloudinary_cloud, sender_img_id)
     else:
-        url = 'https://res.cloudinary.com/{0}/image/upload/c_thumb,' \
+        male_url = ['https://res.cloudinary.com/{0}/image/upload/c_thumb,' \
         'g_face:center,h_90,r_max,w_60/a_-10/u_bradgelina,x_110,y_310/v1484046371/' \
-        '{1}.jpg'.format(cloudinary_cloud,sender_img_id)
+        '{1}.jpg'.format(cloudinary_cloud, sender_img_id), 
+        'https://res.cloudinary.com/{0}/image/upload/c_thumb,' \
+        'g_face,r_max,w_130/u_wang2,x_50,y_180/v1484046371/' \
+        '{1}.jpg'.format(cloudinary_cloud, sender_img_id)
+        ]
+
     template = ImageSendMessage(
         original_content_url=url,
         preview_image_url=url
