@@ -413,9 +413,15 @@ def createRedCarpet(data):
         'g_face:center,h_100,r_max,w_70/u_bradgelina,x_-20,y_290/v1484046371/' \
         '{1}.jpg'.format(cloudinary_cloud, sender_img_id)
     else:
-        url = 'https://res.cloudinary.com/{0}/image/upload/c_thumb,' \
+        male_url = ['https://res.cloudinary.com/{0}/image/upload/c_thumb,' \
         'g_face:center,h_90,r_max,w_60/a_-10/u_bradgelina,x_110,y_310/v1484046371/' \
-        '{1}.jpg'.format(cloudinary_cloud,sender_img_id)
+        '{1}.jpg'.format(cloudinary_cloud,sender_img_id),
+        'http://res.cloudinary.com/{0}/image/upload/c_thumb,' \
+        'g_face:center,r_max,w_120/u_wang2,x_50,y_70/v1484046371/' \
+        '{1}.jpg'.format(cloudinary_cloud,sender_img_id)]
+        i = randint(0,1)
+        url = male_url[i]
+
     template = ImageSendMessage(
         original_content_url=url,
         preview_image_url=url
