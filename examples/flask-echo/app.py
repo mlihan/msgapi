@@ -46,8 +46,8 @@ app = Flask(__name__)
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
 channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', None)
 oa_id = os.getenv('OA_ID', None)
-bluemix_api_key = os.getenv('BLUEMIX_API_KEY_1', None)
-bluemix_classifier = os.getenv('BLUEMIX_CLASSIFIER_1', None)
+bluemix_api_key = os.getenv('BLUEMIX_API_KEY_2', None)
+bluemix_classifier = os.getenv('BLUEMIX_CLASSIFIER_2', None)
 cloudinary_cloud = os.getenv('CLOUDINARY_CLOUD', None)
 
 if channel_secret is None:
@@ -131,9 +131,6 @@ def analyzePostbackEvent(event):
     data = str(event.postback.data)
     if 'action=tryme' in data:
         sendMessage = None
-        global bluemix_index
-        bluemix_index = ((bluemix_index + 1) % 4)
-        updateBluemixKey(bluemix_index+1)
         if 'user_id' in data:
             # Use profile picture of user to classify
             user_id = data.split('&')[1].split('=')[1]
@@ -186,10 +183,11 @@ def classifyImageMessage(image_url):
     app.logger.debug('BLUEMIX classifier:' + bluemix_classifier)
     try: 
         response = visual_recognition.classify(
-        images_url=image_url,
-        classifier_ids=[bluemix_classifier, 'default'], 
-        threshold=threshold
+            images_url=image_url,
+            classifier_ids=[bluemix_classifier, 'default'], 
+            threshold=threshold
         )
+        if response['images'][0]['classifiers']['']
     except:
         app.logger.error('Bluemix unexpected error please check limit.' + json.dumps(response))
         global bluemix_index
@@ -422,7 +420,7 @@ def updateBluemixKey(index):
 
     bluemix_classifier = os.getenv(classifier, None)
     bluemix_api_key = os.getenv(api_key, None)
-    app.logger.info('[BLUEMIX] Update index {0} and classifier {1}'.format(str(bluemix_api_key), bluemix_classifier))
+    app.logger.info('[BLUEMIX] Update index {0} and classifier {1}'.format(bluemix_api_key, bluemix_classifier))
     visual_recognition = VisualRecognitionV3('2016-05-20', api_key=bluemix_api_key)
 
 # get picture url of a profile
